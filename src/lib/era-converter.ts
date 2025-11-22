@@ -58,32 +58,22 @@ export function calculateSchoolSchedule(birthYear: number, birthMonth: number, b
   const universityEntry = highGraduation;
   const universityGraduation = universityEntry + 4;
 
-  // 4月1日で計算
-  const entryEra = convertToEra(elementaryEntry, 4, 1);
-  const elemGradEra = convertToEra(elementaryGraduation, 3, 31);
-  const juniorEntryEra = convertToEra(juniorHighEntry, 4, 1);
-  const juniorGradEra = convertToEra(juniorHighGraduation, 3, 31);
-  const highEntryEra = convertToEra(highEntry, 4, 1);
-  const highGradEra = convertToEra(highGraduation, 3, 31);
-  const uniEntryEra = convertToEra(universityEntry, 4, 1);
-  const uniGradEra = convertToEra(universityGraduation, 3, 31);
-
   return {
     elementary: {
-      entry: `${elementaryEntry}年(${entryEra?.displayName || ""})4月`,
-      graduation: `${elementaryGraduation}年(${elemGradEra?.displayName || ""})3月`,
+      entry: `${elementaryEntry}年4月`,
+      graduation: `${elementaryGraduation}年3月`,
     },
     juniorHigh: {
-      entry: `${juniorHighEntry}年(${juniorEntryEra?.displayName || ""})4月`,
-      graduation: `${juniorHighGraduation}年(${juniorGradEra?.displayName || ""})3月`,
+      entry: `${juniorHighEntry}年4月`,
+      graduation: `${juniorHighGraduation}年3月`,
     },
     high: {
-      entry: `${highEntry}年(${highEntryEra?.displayName || ""})4月`,
-      graduation: `${highGraduation}年(${highGradEra?.displayName || ""})3月`,
+      entry: `${highEntry}年4月`,
+      graduation: `${highGraduation}年3月`,
     },
     university: {
-      entry: `${universityEntry}年(${uniEntryEra?.displayName || ""})4月`,
-      graduation: `${universityGraduation}年(${uniGradEra?.displayName || ""})3月`,
+      entry: `${universityEntry}年4月`,
+      graduation: `${universityGraduation}年3月`,
     },
   };
 }

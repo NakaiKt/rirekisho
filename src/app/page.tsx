@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +29,7 @@ export default function Home() {
   } = useForm<ResumeFormData>({
     resolver: zodResolver(resumeSchema),
     defaultValues: {
+      birthDate: "",
       education: [],
       workHistory: [],
       qualifications: [],
@@ -71,10 +73,18 @@ export default function Home() {
   const motivationValue = watch("motivation") || "";
   const remarksValue = watch("remarks") || "";
   const postalCodeValue = watch("postalCode") || "";
+  const birthDateValue = watch("birthDate") || "";
   const isPostalCodeComplete = postalCodeValue.replace(/-/g, "").length === 7;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [postalLookupMessage, setPostalLookupMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+
+  const parseBirthDate = (value?: string) => {
+    if (!value) return null;
+    const [year, month, day] = value.split("/").map(Number);
+    if (!year || !month || !day) return null;
+    return { year, month, day };
+  };
 
   useEffect(() => {
     // 初回ロード時にローカルストレージから復元
@@ -96,16 +106,13 @@ export default function Home() {
   }, [formValues]);
 
   // 生年月日から学歴を計算
-  const birthYear = watch("birthYear");
-  const birthMonth = watch("birthMonth");
-  const birthDay = watch("birthDay");
-  const schoolSchedule =
-    birthYear && birthMonth && birthDay
-      ? calculateSchoolSchedule(birthYear, birthMonth, birthDay)
-      : null;
+  const parsedBirthDate = parseBirthDate(birthDateValue);
+  const schoolSchedule = parsedBirthDate
+    ? calculateSchoolSchedule(parsedBirthDate.year, parsedBirthDate.month, parsedBirthDate.day)
+    : null;
 
   // 郵便番号から住所を自動入力
-  const handlePostalLookup = () => {
+  const handlePostalLookup = async () => {
     const postalCode = postalCodeValue;
     setPostalLookupMessage(null);
     if (!postalCode || postalCode.replace(/-/g, "").length !== 7) {
@@ -113,12 +120,11 @@ export default function Home() {
       return;
     }
 
-    const result = searchPostalCode(postalCode);
+    const result = await searchPostalCode(postalCode);
     if (result) {
       setValue("prefecture", result.prefecture);
       setValue("city", result.city);
       setValue("address", result.address);
-      setPostalLookupMessage("住所を自動入力しました。");
     } else {
       setPostalLookupMessage("住所を見つけられませんでした。手入力してください。");
     }
@@ -231,48 +237,38 @@ export default function Home() {
                 <Label>
                   生年月日 <span className="text-red-500">*</span>
                 </Label>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Input
-                      type="number"
-                      {...register("birthYear", { valueAsNumber: true })}
-                      placeholder="1990"
-                      aria-invalid={!!errors.birthYear}
-                      className={errors.birthYear ? "border-red-500" : ""}
-                    />
-                    <span className="text-sm text-muted-foreground">年</span>
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      {...register("birthMonth", { valueAsNumber: true })}
-                      placeholder="1"
-                      min="1"
-                      max="12"
-                      aria-invalid={!!errors.birthMonth}
-                      className={errors.birthMonth ? "border-red-500" : ""}
-                    />
-                    <span className="text-sm text-muted-foreground">月</span>
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      {...register("birthDay", { valueAsNumber: true })}
-                      placeholder="1"
-                      min="1"
-                      max="31"
-                      aria-invalid={!!errors.birthDay}
-                      className={errors.birthDay ? "border-red-500" : ""}
-                    />
-                    <span className="text-sm text-muted-foreground">日</span>
-                  </div>
+                <div className="space-y-1">
+                  <Input
+                    id="birthDate"
+                    inputMode="numeric"
+                    placeholder="2000/01/31"
+                    aria-invalid={!!errors.birthDate}
+                    value={birthDateValue}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, "");
+                      const limited = raw.slice(0, 8);
+                      const parts = [] as string[];
+                      if (limited.length >= 4) {
+                        parts.push(limited.slice(0, 4));
+                        if (limited.length >= 6) {
+                          parts.push(limited.slice(4, 6));
+                          if (limited.length > 6) {
+                            parts.push(limited.slice(6, 8));
+                          }
+                        } else {
+                          parts.push(limited.slice(4));
+                        }
+                      } else {
+                        parts.push(limited);
+                      }
+                      const formatted = parts.join("/");
+                      setValue("birthDate", formatted);
+                    }}
+                    className={`font-mono ${errors.birthDate ? "border-red-500" : ""}`}
+                  />
                 </div>
-                {(errors.birthYear || errors.birthMonth || errors.birthDay) && (
-                  <p className="text-sm text-red-500">
-                    {errors.birthYear?.message ||
-                      errors.birthMonth?.message ||
-                      errors.birthDay?.message}
-                  </p>
+                {errors.birthDate && (
+                  <p className="text-sm text-red-500">{errors.birthDate.message}</p>
                 )}
               </div>
 
@@ -325,9 +321,12 @@ export default function Home() {
               />
               {formValues.photo && (
                 <div className="mt-4">
-                  <img
+                  <Image
                     src={formValues.photo}
                     alt="証明写真"
+                    width={128}
+                    height={160}
+                    unoptimized
                     className="w-32 h-40 object-cover border rounded"
                   />
                 </div>
@@ -339,9 +338,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>連絡先（任意）</CardTitle>
-              <CardDescription>
-                郵便番号を入力すると、住所が自動入力されます（主要な郵便番号のみ対応）。
-              </CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -403,265 +400,287 @@ export default function Home() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">メールアドレス</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register("email")}
-                  placeholder="example@example.com"
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="email">メールアドレス</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    {...register("email")}
+                    placeholder="example@example.com"
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-red-500">{errors.email.message}</p>
+                  )}
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">電話番号</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  {...register("phone")}
-                  placeholder="090-1234-5678"
-                />
+                <div className="space-y-2 md:col-span-1">
+                  <Label htmlFor="phone">電話番号</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    {...register("phone")}
+                    placeholder="090-1234-5678"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <div className="space-y-4 lg:grid lg:grid-cols-[1.6fr,1fr] lg:gap-6 lg:items-start lg:space-y-0">
-            <Card>
-              <CardHeader>
-                <CardTitle>学歴（任意）</CardTitle>
-                <CardDescription>
-                  学校の入学・卒業情報を追加できます。上記の生年月日から自動計算された目安を参考にしてください。
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {educationFields.map((field, index) => (
-                  <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2"
-                      onClick={() => removeEducation(index)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+          <Card>
+            <CardHeader>
+              <CardTitle>学歴（任意）</CardTitle>
+              <CardDescription></CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                {educationFields.map((field, index) => {
+                  const status =
+                    (watch(`education.${index}.status` as const) as
+                      | NonNullable<ResumeFormData["education"]>[number]["status"]
+                      | undefined) ||
+                    field.status ||
+                    "graduated";
+                  return (
+                    <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={() => removeEducation(index)}
+                        aria-label="学歴を削除"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
 
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label>年</Label>
-                        <Input
-                          type="number"
-                          {...register(`education.${index}.year` as const, {
-                            valueAsNumber: true,
-                          })}
-                          placeholder="2020"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>月</Label>
-                        <Input
-                          type="number"
-                          {...register(`education.${index}.month` as const, {
-                            valueAsNumber: true,
-                          })}
-                          placeholder="4"
-                          min="1"
-                          max="12"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>入学/卒業</Label>
-                        <RadioGroup
-                          defaultValue={field.type}
-                          onValueChange={(value) =>
-                            setValue(`education.${index}.type`, value as "entry" | "graduation")
-                          }
-                        >
-                          <div className="flex space-x-2">
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem
-                                value="entry"
-                                id={`education-${index}-entry`}
-                              />
-                              <Label
-                                htmlFor={`education-${index}-entry`}
-                                className="font-normal cursor-pointer text-sm"
-                              >
-                                入学
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem
-                                value="graduation"
-                                id={`education-${index}-graduation`}
-                              />
-                              <Label
-                                htmlFor={`education-${index}-graduation`}
-                                className="font-normal cursor-pointer text-sm"
-                              >
-                                卒業
-                              </Label>
-                            </div>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label>入学年月</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              placeholder="2020"
+                              {...register(`education.${index}.entryYear` as const, {
+                                valueAsNumber: true,
+                              })}
+                            />
+                            <Input
+                              type="number"
+                              placeholder="4"
+                              min="1"
+                              max="12"
+                              {...register(`education.${index}.entryMonth` as const, {
+                                valueAsNumber: true,
+                              })}
+                            />
                           </div>
-                        </RadioGroup>
+                        </div>
+
+                        <div className="grid gap-2">
+                          <Label>終了年月</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              placeholder="2024"
+                              disabled={status === "enrolled"}
+                              {...register(`education.${index}.completionYear` as const, {
+                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
+                              })}
+                            />
+                            <Input
+                              type="number"
+                              placeholder="3"
+                              min="1"
+                              max="12"
+                              disabled={status === "enrolled"}
+                              {...register(`education.${index}.completionMonth` as const, {
+                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
+                              })}
+                            />
+                          </div>
+                          <div className="w-1/2">
+                            <select
+                              {...register(`education.${index}.status` as const, {
+                                onChange: (e) => {
+                                  const value =
+                                    e.target.value as NonNullable<
+                                      ResumeFormData["education"]
+                                    >[number]["status"];
+                                  setValue(`education.${index}.status` as const, value);
+                                  if (value === "enrolled") {
+                                    setValue(`education.${index}.completionYear` as const, undefined);
+                                    setValue(`education.${index}.completionMonth` as const, undefined);
+                                  }
+                                },
+                              })}
+                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            >
+                              <option value="graduated">卒業</option>
+                              <option value="withdrawn">中退</option>
+                              <option value="completed">修了</option>
+                              <option value="enrolled">在学中</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>学校名</Label>
+                        <Input
+                          {...register(`education.${index}.schoolName` as const)}
+                          placeholder="○○大学 △△学部"
+                        />
                       </div>
                     </div>
+                  );
+                })}
+              </div>
 
-                    <div className="space-y-2">
-                      <Label>学校名</Label>
-                      <Input
-                        {...register(`education.${index}.schoolName` as const)}
-                        placeholder="○○大学 △△学部"
-                      />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  appendEducation({
+                    id: crypto.randomUUID(),
+                    entryYear: undefined,
+                    entryMonth: undefined,
+                    schoolName: "",
+                    status: "graduated",
+                  })
+                }
+                className="w-full"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                学歴を追加
+              </Button>
+
+              <div className="space-y-3 rounded-lg border bg-muted/60 p-4">
+                {schoolSchedule && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-blue-900">学歴目安</p>
+                    <div className="text-sm text-blue-800 space-y-1">
+                      <p>小学校: {schoolSchedule.elementary.entry} 入学 → {schoolSchedule.elementary.graduation} 卒業</p>
+                      <p>中学校: {schoolSchedule.juniorHigh.entry} 入学 → {schoolSchedule.juniorHigh.graduation} 卒業</p>
+                      <p>高校: {schoolSchedule.high.entry} 入学 → {schoolSchedule.high.graduation} 卒業</p>
+                      <p>大学: {schoolSchedule.university.entry} 入学 → {schoolSchedule.university.graduation} 卒業</p>
                     </div>
                   </div>
-                ))}
+                )}
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    appendEducation({
-                      id: crypto.randomUUID(),
-                      year: new Date().getFullYear(),
-                      month: 4,
-                      schoolName: "",
-                      type: "entry",
-                    })
-                  }
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  学歴を追加
-                </Button>
-              </CardContent>
-            </Card>
-
-            <div className="space-y-4">
-              {schoolSchedule && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                  <p className="text-sm font-medium text-blue-900">学歴目安</p>
-                  <div className="text-sm text-blue-800 space-y-1">
-                    <p>小学校: {schoolSchedule.elementary.entry} 入学 → {schoolSchedule.elementary.graduation} 卒業</p>
-                    <p>中学校: {schoolSchedule.juniorHigh.entry} 入学 → {schoolSchedule.juniorHigh.graduation} 卒業</p>
-                    <p>高校: {schoolSchedule.high.entry} 入学 → {schoolSchedule.high.graduation} 卒業</p>
-                    <p>大学: {schoolSchedule.university.entry} 入学 → {schoolSchedule.university.graduation} 卒業</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="bg-muted border rounded-lg p-4 space-y-2">
-                <p className="text-sm font-medium">入力のヒント</p>
-                <p className="text-sm text-muted-foreground">
-                  入学・卒業の区分と年／月を揃えて入力すると並び替えや確認がしやすくなります。学校名には学部や学科まで記載すると、経歴がより伝わりやすくなります。
-                </p>
+                <div className="space-y-1"></div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* 職歴 */}
           <Card>
             <CardHeader>
               <CardTitle>職歴（任意）</CardTitle>
-              <CardDescription>
-                これまでの職歴を追加できます。入社・退社の情報を入力してください。
-              </CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {workHistoryFields.map((field, index) => (
-                <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2"
-                    onClick={() => removeWorkHistory(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label>年</Label>
-                      <Input
-                        type="number"
-                        {...register(`workHistory.${index}.year` as const, {
-                          valueAsNumber: true,
-                        })}
-                        placeholder="2020"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>月</Label>
-                      <Input
-                        type="number"
-                        {...register(`workHistory.${index}.month` as const, {
-                          valueAsNumber: true,
-                        })}
-                        placeholder="4"
-                        min="1"
-                        max="12"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>入社/退社</Label>
-                      <RadioGroup
-                        defaultValue={field.type}
-                        onValueChange={(value) =>
-                          setValue(`workHistory.${index}.type`, value as "entry" | "exit")
-                        }
+              <div className="space-y-4">
+                {workHistoryFields.map((field, index) => {
+                  type WorkStatus =
+                    NonNullable<ResumeFormData["workHistory"]>[number]["status"];
+                  const status =
+                    (watch(`workHistory.${index}.status` as const) as
+                      | WorkStatus
+                      | undefined) ||
+                    field.status ||
+                    "employed";
+                  return (
+                    <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={() => removeWorkHistory(index)}
+                        aria-label="職歴を削除"
                       >
-                        <div className="flex space-x-2">
-                          <div className="flex items-center space-x-1">
-                            <RadioGroupItem
-                              value="entry"
-                              id={`work-${index}-entry`}
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label>入社年月</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              placeholder="2020"
+                              {...register(`workHistory.${index}.entryYear` as const, {
+                                valueAsNumber: true,
+                              })}
                             />
-                            <Label
-                              htmlFor={`work-${index}-entry`}
-                              className="font-normal cursor-pointer text-sm"
-                            >
-                              入社
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <RadioGroupItem
-                              value="exit"
-                              id={`work-${index}-exit`}
+                            <Input
+                              type="number"
+                              placeholder="4"
+                              min="1"
+                              max="12"
+                              {...register(`workHistory.${index}.entryMonth` as const, {
+                                valueAsNumber: true,
+                              })}
                             />
-                            <Label
-                              htmlFor={`work-${index}-exit`}
-                              className="font-normal cursor-pointer text-sm"
-                            >
-                              退社
-                            </Label>
                           </div>
                         </div>
-                      </RadioGroup>
+
+                        <div className="grid gap-2">
+                          <Label>退社年月</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              placeholder="2024"
+                              disabled={status === "employed"}
+                              {...register(`workHistory.${index}.exitYear` as const, {
+                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
+                              })}
+                            />
+                            <Input
+                              type="number"
+                              placeholder="3"
+                              min="1"
+                              max="12"
+                              disabled={status === "employed"}
+                              {...register(`workHistory.${index}.exitMonth` as const, {
+                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
+                              })}
+                            />
+                          </div>
+                          <div className="w-1/2">
+                            <select
+                              {...register(`workHistory.${index}.status` as const, {
+                                onChange: (e) => {
+                                  const value = e.target.value as WorkStatus;
+                                  setValue(`workHistory.${index}.status` as const, value);
+                                  if (value === "employed") {
+                                    setValue(`workHistory.${index}.exitYear` as const, undefined);
+                                    setValue(`workHistory.${index}.exitMonth` as const, undefined);
+                                  }
+                                },
+                              })}
+                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            >
+                              <option value="employed">在職中</option>
+                              <option value="resigned">退社</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>会社名</Label>
+                        <Input
+                          {...register(`workHistory.${index}.companyName` as const)}
+                          placeholder="株式会社○○"
+                        />
+                      </div>
+
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>会社名</Label>
-                    <Input
-                      {...register(`workHistory.${index}.companyName` as const)}
-                      placeholder="株式会社○○"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>業務内容（任意）</Label>
-                    <Textarea
-                      {...register(`workHistory.${index}.description` as const)}
-                      placeholder="担当業務や役職など"
-                      rows={2}
-                    />
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
 
               <Button
                 type="button"
@@ -669,10 +688,10 @@ export default function Home() {
                 onClick={() =>
                   appendWorkHistory({
                     id: crypto.randomUUID(),
-                    year: new Date().getFullYear(),
-                    month: 4,
+                    entryYear: undefined,
+                    entryMonth: undefined,
                     companyName: "",
-                    type: "entry",
+                    status: "employed",
                   })
                 }
                 className="w-full"
@@ -746,8 +765,8 @@ export default function Home() {
                 onClick={() =>
                   appendQualification({
                     id: crypto.randomUUID(),
-                    year: new Date().getFullYear(),
-                    month: 4,
+                    year: undefined,
+                    month: undefined,
                     name: "",
                   })
                 }
@@ -760,15 +779,6 @@ export default function Home() {
           </Card>
 
           {/* 自己PR */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
-            <p className="font-medium mb-2">💡 自己PRの書き方のポイント</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>具体的なエピソードを交えて書く</li>
-              <li>数字や実績を盛り込むと説得力が増す</li>
-              <li>応募先企業で活かせる強みを強調する</li>
-              <li>200〜400字程度が目安</li>
-            </ul>
-          </div>
           <Card>
             <CardHeader>
               <CardTitle>自己PR（任意）</CardTitle>
@@ -776,28 +786,28 @@ export default function Home() {
                 あなたの強みや特技、これまでの経験をアピールしましょう。
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
+                <p className="font-medium mb-2">💡 自己PRの書き方のポイント</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>具体的なエピソードを交えて書く</li>
+                  <li>数字や実績を盛り込むと説得力が増す</li>
+                  <li>応募先企業で活かせる強みを強調する</li>
+                  <li>200〜400字程度が目安</li>
+                </ul>
+              </div>
               <div className="flex justify-end text-sm text-muted-foreground">
                 文字数: {selfPRValue.length}
               </div>
               <Textarea
                 {...register("selfPR")}
                 placeholder="例：私の強みは、コミュニケーション能力と問題解決力です。前職では..."
-                rows={6}
+                rows={5}
               />
             </CardContent>
           </Card>
 
           {/* 志望動機 */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
-            <p className="font-medium mb-2">💡 志望動機の書き方のポイント</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>企業研究を行い、その企業ならではの魅力を述べる</li>
-              <li>自分の経験やスキルと関連付ける</li>
-              <li>入社後にどう貢献したいかを具体的に書く</li>
-              <li>200〜400字程度が目安</li>
-            </ul>
-          </div>
           <Card>
             <CardHeader>
               <CardTitle>志望動機（任意）</CardTitle>
@@ -805,14 +815,23 @@ export default function Home() {
                 なぜこの企業・職種を志望するのか、あなたの思いを伝えましょう。
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-3">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
+                <p className="font-medium mb-2">💡 志望動機の書き方のポイント</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>企業研究を行い、その企業ならではの魅力を述べる</li>
+                  <li>自分の経験やスキルと関連付ける</li>
+                  <li>入社後にどう貢献したいかを具体的に書く</li>
+                  <li>200〜400字程度が目安</li>
+                </ul>
+              </div>
               <div className="flex justify-end text-sm text-muted-foreground">
                 文字数: {motivationValue.length}
               </div>
               <Textarea
                 {...register("motivation")}
                 placeholder="例：貴社の〇〇という理念に共感し、これまでの経験を活かして..."
-                rows={6}
+                rows={5}
               />
             </CardContent>
           </Card>
@@ -832,7 +851,7 @@ export default function Home() {
               <Textarea
                 {...register("remarks")}
                 placeholder="例：勤務地は東京都内を希望します。"
-                rows={4}
+                rows={5}
               />
             </CardContent>
           </Card>

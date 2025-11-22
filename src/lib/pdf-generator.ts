@@ -1,47 +1,37 @@
-import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export async function generateResumePDF(element: HTMLElement): Promise<void> {
   try {
-    // HTML要素をキャンバスに変換
     const canvas = await html2canvas(element, {
-      scale: 2, // 高解像度
+      scale: 2,
       useCORS: true,
-      logging: false,
       backgroundColor: "#ffffff",
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
     });
 
-    // キャンバスの寸法を取得
-    const imgWidth = 210; // A4幅 (mm)
-    const pageHeight = 297; // A4高さ (mm)
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const imageData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-    // PDFを作成
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const imageWidth = pageWidth;
+    const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
-    let heightLeft = imgHeight;
     let position = 0;
+    let heightLeft = imageHeight;
 
-    // キャンバスを画像として取得
-    const imgData = canvas.toDataURL("image/png");
-
-    // 最初のページに画像を追加
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    pdf.addImage(imageData, "PNG", 0, position, imageWidth, imageHeight);
     heightLeft -= pageHeight;
 
-    // 複数ページの場合
     while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
+      position -= pageHeight;
       pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imageData, "PNG", 0, position, imageWidth, imageHeight);
       heightLeft -= pageHeight;
     }
 
-    // PDFを新しいタブで開く
     const pdfBlob = pdf.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, "_blank");
