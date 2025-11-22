@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResumeFormData, resumeSchema } from "@/lib/validation";
@@ -15,6 +15,7 @@ import { FileText, Shield, Plus, Trash2 } from "lucide-react";
 import { calculateSchoolSchedule } from "@/lib/era-converter";
 import { searchPostalCode, formatPostalCode } from "@/lib/postal-code";
 import { generateResumePDF } from "@/lib/pdf-generator";
+import { ResumePreview } from "@/components/ResumePreview";
 
 export default function Home() {
   const {
@@ -59,6 +60,10 @@ export default function Home() {
     control,
     name: "qualifications",
   });
+
+  // PDF生成用のref
+  const resumePreviewRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // フォームの値を監視してローカルストレージに保存
   const formValues = watch();
@@ -117,12 +122,20 @@ export default function Home() {
   };
 
   // PDF生成
-  const onSubmit = async (data: ResumeFormData) => {
+  const onSubmit = async () => {
+    if (!resumePreviewRef.current) {
+      alert("プレビューの生成に失敗しました。");
+      return;
+    }
+
+    setIsGenerating(true);
     try {
-      await generateResumePDF(data);
+      await generateResumePDF(resumePreviewRef.current);
     } catch (error) {
-      console.error("PDF generation failed:", error);
+      console.error("PDF生成に失敗しました:", error);
       alert("PDF生成に失敗しました。もう一度お試しください。");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -765,9 +778,14 @@ export default function Home() {
 
           {/* 提出ボタン */}
           <div className="flex justify-center pt-6">
-            <Button type="submit" size="lg" className="w-full md:w-auto px-12">
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full md:w-auto px-12"
+              disabled={isGenerating}
+            >
               <FileText className="w-5 h-5 mr-2" />
-              履歴書を作成する
+              {isGenerating ? "生成中..." : "履歴書を作成する"}
             </Button>
           </div>
         </form>
@@ -776,6 +794,11 @@ export default function Home() {
         <div className="text-center mt-12 text-sm text-muted-foreground">
           <p>入力内容は自動的にブラウザに保存されます</p>
         </div>
+      </div>
+
+      {/* PDF生成用の非表示プレビュー */}
+      <div className="fixed left-[-9999px] top-0">
+        <ResumePreview ref={resumePreviewRef} data={formValues as ResumeFormData} />
       </div>
     </div>
   );
