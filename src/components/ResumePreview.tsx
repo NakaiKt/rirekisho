@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { forwardRef } from "react";
 import { ResumeFormData } from "@/lib/validation";
 import { convertToEra } from "@/lib/era-converter";
@@ -124,9 +125,12 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
               </td>
               <td className="border border-black p-0 w-32 align-top" rowSpan={4}>
                 {data.photo ? (
-                  <img
+                  <Image
                     src={data.photo}
                     alt="証明写真"
+                    width={128}
+                    height={160}
+                    unoptimized
                     className="w-full h-full object-cover"
                     style={{ height: "160px" }}
                   />

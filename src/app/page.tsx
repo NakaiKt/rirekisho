@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -322,9 +323,12 @@ export default function Home() {
               />
               {formValues.photo && (
                 <div className="mt-4">
-                  <img
+                  <Image
                     src={formValues.photo}
                     alt="証明写真"
+                    width={128}
+                    height={160}
+                    unoptimized
                     className="w-32 h-40 object-cover border rounded"
                   />
                 </div>
@@ -581,9 +585,11 @@ export default function Home() {
             <CardContent className="space-y-4">
               <div className="space-y-4">
                 {workHistoryFields.map((field, index) => {
+                  type WorkStatus =
+                    NonNullable<ResumeFormData["workHistory"]>[number]["status"];
                   const status =
                     (watch(`workHistory.${index}.status` as const) as
-                      | ResumeFormData["workHistory"][number]["status"]
+                      | WorkStatus
                       | undefined) ||
                     field.status ||
                     "employed";
