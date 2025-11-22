@@ -234,21 +234,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* 学歴自動計算の表示 */}
-              {schoolSchedule && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                  <p className="text-sm font-medium text-blue-900">
-                    ストレート卒業の場合の学歴目安
-                  </p>
-                  <div className="text-sm text-blue-800 space-y-1">
-                    <p>小学校: {schoolSchedule.elementary.entry} 入学 → {schoolSchedule.elementary.graduation} 卒業</p>
-                    <p>中学校: {schoolSchedule.juniorHigh.entry} 入学 → {schoolSchedule.juniorHigh.graduation} 卒業</p>
-                    <p>高校: {schoolSchedule.high.entry} 入学 → {schoolSchedule.high.graduation} 卒業</p>
-                    <p>大学: {schoolSchedule.university.entry} 入学 → {schoolSchedule.university.graduation} 卒業</p>
-                  </div>
-                </div>
-              )}
-
               {/* 性別 */}
               <div className="space-y-2">
                 <Label>
@@ -393,108 +378,133 @@ export default function Home() {
                 学校の入学・卒業情報を追加できます。上記の生年月日から自動計算された目安を参考にしてください。
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {educationFields.map((field, index) => (
-                <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2"
-                    onClick={() => removeEducation(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+          <CardContent>
+            <div className="space-y-6 lg:grid lg:grid-cols-[1.6fr,1fr] lg:gap-6 lg:space-y-0">
+              <div className="space-y-4">
+                {educationFields.map((field, index) => (
+                  <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={() => removeEducation(index)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
 
-                  <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>年</Label>
+                        <Input
+                          type="number"
+                          {...register(`education.${index}.year` as const, {
+                            valueAsNumber: true,
+                          })}
+                          placeholder="2020"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>月</Label>
+                        <Input
+                          type="number"
+                          {...register(`education.${index}.month` as const, {
+                            valueAsNumber: true,
+                          })}
+                          placeholder="4"
+                          min="1"
+                          max="12"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>入学/卒業</Label>
+                        <RadioGroup
+                          defaultValue={field.type}
+                          onValueChange={(value) =>
+                            setValue(`education.${index}.type`, value as "entry" | "graduation")
+                          }
+                        >
+                          <div className="flex space-x-2">
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem
+                                value="entry"
+                                id={`education-${index}-entry`}
+                              />
+                              <Label
+                                htmlFor={`education-${index}-entry`}
+                                className="font-normal cursor-pointer text-sm"
+                              >
+                                入学
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem
+                                value="graduation"
+                                id={`education-${index}-graduation`}
+                              />
+                              <Label
+                                htmlFor={`education-${index}-graduation`}
+                                className="font-normal cursor-pointer text-sm"
+                              >
+                                卒業
+                              </Label>
+                            </div>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label>年</Label>
+                      <Label>学校名</Label>
                       <Input
-                        type="number"
-                        {...register(`education.${index}.year` as const, {
-                          valueAsNumber: true,
-                        })}
-                        placeholder="2020"
+                        {...register(`education.${index}.schoolName` as const)}
+                        placeholder="○○大学 △△学部"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>月</Label>
-                      <Input
-                        type="number"
-                        {...register(`education.${index}.month` as const, {
-                          valueAsNumber: true,
-                        })}
-                        placeholder="4"
-                        min="1"
-                        max="12"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>入学/卒業</Label>
-                      <RadioGroup
-                        defaultValue={field.type}
-                        onValueChange={(value) =>
-                          setValue(`education.${index}.type`, value as "entry" | "graduation")
-                        }
-                      >
-                        <div className="flex space-x-2">
-                          <div className="flex items-center space-x-1">
-                            <RadioGroupItem
-                              value="entry"
-                              id={`education-${index}-entry`}
-                            />
-                            <Label
-                              htmlFor={`education-${index}-entry`}
-                              className="font-normal cursor-pointer text-sm"
-                            >
-                              入学
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <RadioGroupItem
-                              value="graduation"
-                              id={`education-${index}-graduation`}
-                            />
-                            <Label
-                              htmlFor={`education-${index}-graduation`}
-                              className="font-normal cursor-pointer text-sm"
-                            >
-                              卒業
-                            </Label>
-                          </div>
-                        </div>
-                      </RadioGroup>
-                    </div>
                   </div>
+                ))}
 
-                  <div className="space-y-2">
-                    <Label>学校名</Label>
-                    <Input
-                      {...register(`education.${index}.schoolName` as const)}
-                      placeholder="○○大学 △△学部"
-                    />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    appendEducation({
+                      id: crypto.randomUUID(),
+                      year: new Date().getFullYear(),
+                      month: 4,
+                      schoolName: "",
+                      type: "entry",
+                    })
+                  }
+                  className="w-full"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  学歴を追加
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                {schoolSchedule && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                    <p className="text-sm font-medium text-blue-900">学歴目安</p>
+                    <div className="text-sm text-blue-800 space-y-1">
+                      <p>小学校: {schoolSchedule.elementary.entry} 入学 → {schoolSchedule.elementary.graduation} 卒業</p>
+                      <p>中学校: {schoolSchedule.juniorHigh.entry} 入学 → {schoolSchedule.juniorHigh.graduation} 卒業</p>
+                      <p>高校: {schoolSchedule.high.entry} 入学 → {schoolSchedule.high.graduation} 卒業</p>
+                      <p>大学: {schoolSchedule.university.entry} 入学 → {schoolSchedule.university.graduation} 卒業</p>
+                    </div>
                   </div>
+                )}
+
+                <div className="bg-muted border rounded-lg p-4 space-y-2">
+                  <p className="text-sm font-medium">入力のヒント</p>
+                  <p className="text-sm text-muted-foreground">
+                    入学・卒業の区分と年／月を揃えて入力すると並び替えや確認がしやすくなります。学校名には学部や学科まで記載すると、経歴がより伝わりやすくなります。
+                  </p>
                 </div>
-              ))}
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  appendEducation({
-                    id: crypto.randomUUID(),
-                    year: new Date().getFullYear(),
-                    month: 4,
-                    schoolName: "",
-                    type: "entry",
-                  })
-                }
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                学歴を追加
-              </Button>
-            </CardContent>
+              </div>
+            </div>
+          </CardContent>
           </Card>
 
           {/* 職歴 */}
