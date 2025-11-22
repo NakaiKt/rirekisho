@@ -95,7 +95,6 @@ export const resumeSchema = z.object({
         status: z.enum(["employed", "resigned"]),
         exitYear: z.number().optional(),
         exitMonth: z.number().optional(),
-        description: z.string().optional(),
       })
     )
     .superRefine((entries, ctx) => {

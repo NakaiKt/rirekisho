@@ -499,30 +499,29 @@ export default function Home() {
                               })}
                             />
                           </div>
-                        </div>
-
-                        <div className="space-y-2 md:col-span-2">
-                          <select
-                            {...register(`education.${index}.status` as const, {
-                              onChange: (e) => {
-                                const value =
-                                  e.target.value as NonNullable<
-                                    ResumeFormData["education"]
-                                  >[number]["status"];
-                                setValue(`education.${index}.status` as const, value);
-                                if (value === "enrolled") {
-                                  setValue(`education.${index}.completionYear` as const, undefined);
-                                  setValue(`education.${index}.completionMonth` as const, undefined);
-                                }
-                              },
-                            })}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          >
-                            <option value="graduated">卒業</option>
-                            <option value="withdrawn">中退</option>
-                            <option value="completed">修了</option>
-                            <option value="enrolled">在学中</option>
-                          </select>
+                          <div className="w-1/2">
+                            <select
+                              {...register(`education.${index}.status` as const, {
+                                onChange: (e) => {
+                                  const value =
+                                    e.target.value as NonNullable<
+                                      ResumeFormData["education"]
+                                    >[number]["status"];
+                                  setValue(`education.${index}.status` as const, value);
+                                  if (value === "enrolled") {
+                                    setValue(`education.${index}.completionYear` as const, undefined);
+                                    setValue(`education.${index}.completionMonth` as const, undefined);
+                                  }
+                                },
+                              })}
+                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            >
+                              <option value="graduated">卒業</option>
+                              <option value="withdrawn">中退</option>
+                              <option value="completed">修了</option>
+                              <option value="enrolled">在学中</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
 
@@ -649,25 +648,24 @@ export default function Home() {
                               })}
                             />
                           </div>
-                        </div>
-
-                        <div className="space-y-2 md:col-span-2">
-                          <select
-                            {...register(`workHistory.${index}.status` as const, {
-                              onChange: (e) => {
-                                const value = e.target.value as WorkStatus;
-                                setValue(`workHistory.${index}.status` as const, value);
-                                if (value === "employed") {
-                                  setValue(`workHistory.${index}.exitYear` as const, undefined);
-                                  setValue(`workHistory.${index}.exitMonth` as const, undefined);
-                                }
-                              },
-                            })}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          >
-                            <option value="employed">在職中</option>
-                            <option value="resigned">退社</option>
-                          </select>
+                          <div className="w-1/2">
+                            <select
+                              {...register(`workHistory.${index}.status` as const, {
+                                onChange: (e) => {
+                                  const value = e.target.value as WorkStatus;
+                                  setValue(`workHistory.${index}.status` as const, value);
+                                  if (value === "employed") {
+                                    setValue(`workHistory.${index}.exitYear` as const, undefined);
+                                    setValue(`workHistory.${index}.exitMonth` as const, undefined);
+                                  }
+                                },
+                              })}
+                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            >
+                              <option value="employed">在職中</option>
+                              <option value="resigned">退社</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
 
@@ -679,14 +677,6 @@ export default function Home() {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>業務内容（任意）</Label>
-                        <Textarea
-                          {...register(`workHistory.${index}.description` as const)}
-                          placeholder="担当業務や役職など"
-                          rows={5}
-                        />
-                      </div>
                     </div>
                   );
                 })}

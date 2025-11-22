@@ -76,19 +76,13 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
     });
 
     const workHistoryRows = (data.workHistory ?? []).flatMap((work) => {
-      const rows: { id: string; year: string | number; month: string | number; text: string; description?: string }[] = [];
+      const rows: { id: string; year: string | number; month: string | number; text: string }[] = [];
       if (typeof work.entryYear !== "number" || typeof work.entryMonth !== "number") {
         return rows;
       }
 
       const entryEra = convertToEra(work.entryYear, work.entryMonth, 1);
-      rows.push({
-        id: `${work.id}-entry`,
-        year: entryEra?.displayName || work.entryYear,
-        month: work.entryMonth,
-        text: `${work.companyName} 入社`,
-        description: work.description,
-      });
+      rows.push({ id: `${work.id}-entry`, year: entryEra?.displayName || work.entryYear, month: work.entryMonth, text: `${work.companyName} 入社` });
 
       if (work.status === "resigned") {
         const exitEra = work.exitYear && work.exitMonth ? convertToEra(work.exitYear, work.exitMonth, 1) : null;
@@ -255,12 +249,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
                   <tr key={work.id}>
                     <td className="border border-black p-2 text-sm text-center">{work.year}</td>
                     <td className="border border-black p-2 text-sm text-center">{work.month}</td>
-                    <td className="border border-black p-2 text-sm">
-                      {work.text}
-                      {work.description && (
-                        <span className="block text-xs text-gray-600 mt-1">{work.description}</span>
-                      )}
-                    </td>
+                    <td className="border border-black p-2 text-sm">{work.text}</td>
                   </tr>
                 ))}
               </>

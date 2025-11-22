@@ -52,7 +52,6 @@ export interface WorkHistoryEntry {
   status: "employed" | "resigned";
   exitYear?: number;
   exitMonth?: number;
-  description?: string;
 }
 
 export interface QualificationEntry {
