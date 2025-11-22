@@ -2,9 +2,7 @@ export interface ResumeFormData {
   // 必須項目
   name: string;
   furigana: string;
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
+  birthDate: string;
   gender: "male" | "female";
 
   // 任意項目
@@ -38,18 +36,22 @@ export interface ResumeFormData {
 
 export interface EducationEntry {
   id: string;
-  year: number;
-  month: number;
   schoolName: string;
-  type: "entry" | "graduation";
+  entryYear: number;
+  entryMonth: number;
+  status: "graduated" | "withdrawn" | "completed" | "enrolled";
+  completionYear?: number;
+  completionMonth?: number;
 }
 
 export interface WorkHistoryEntry {
   id: string;
-  year: number;
-  month: number;
   companyName: string;
-  type: "entry" | "exit";
+  entryYear: number;
+  entryMonth: number;
+  status: "employed" | "resigned";
+  exitYear?: number;
+  exitMonth?: number;
   description?: string;
 }
 

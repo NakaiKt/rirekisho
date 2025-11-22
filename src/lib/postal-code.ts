@@ -28,12 +28,28 @@ const postalCodeDatabase: PostalCodeData[] = [
   { postalCode: "4600001", prefecture: "愛知県", city: "名古屋市中区", address: "三の丸" },
 ];
 
-export function searchPostalCode(postalCode: string): PostalCodeData | null {
+export async function searchPostalCode(postalCode: string): Promise<PostalCodeData | null> {
   // ハイフンを除去
   const cleanCode = postalCode.replace(/-/g, "");
 
   if (cleanCode.length !== 7) {
     return null;
+  }
+
+  try {
+    const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${cleanCode}`);
+    const data = await response.json();
+    if (data?.status === 200 && Array.isArray(data.results) && data.results.length > 0) {
+      const result = data.results[0];
+      return {
+        postalCode: cleanCode,
+        prefecture: result.address1,
+        city: result.address2,
+        address: result.address3,
+      };
+    }
+  } catch (error) {
+    console.error("郵便番号検索に失敗しました", error);
   }
 
   const found = postalCodeDatabase.find((data) => data.postalCode === cleanCode);
