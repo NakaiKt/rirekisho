@@ -241,7 +241,7 @@ export default function Home() {
                   <Input
                     id="birthDate"
                     inputMode="numeric"
-                    placeholder="1997/08/14"
+                    placeholder="2000/01/31"
                     aria-invalid={!!errors.birthDate}
                     value={birthDateValue}
                     onChange={(e) => {
@@ -338,9 +338,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>連絡先（任意）</CardTitle>
-              <CardDescription>
-                日本国内の郵便番号を入力すると住所を自動入力します。
-              </CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -432,9 +430,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>学歴（任意）</CardTitle>
-              <CardDescription>
-                学校の入学・卒業情報を追加できます。上記の生年月日から自動計算された目安を参考にしてください。
-              </CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
@@ -482,10 +478,7 @@ export default function Home() {
                         </div>
 
                         <div className="grid gap-2">
-                          <Label className="flex items-center justify-between">
-                            <span>終了年月</span>
-                            <span className="text-xs text-muted-foreground">卒業・修了区分</span>
-                          </Label>
+                          <Label>終了年月</Label>
                           <div className="grid grid-cols-2 gap-2">
                             <Input
                               type="number"
@@ -551,8 +544,8 @@ export default function Home() {
                 onClick={() =>
                   appendEducation({
                     id: crypto.randomUUID(),
-                    entryYear: new Date().getFullYear(),
-                    entryMonth: 4,
+                    entryYear: undefined,
+                    entryMonth: undefined,
                     schoolName: "",
                     status: "graduated",
                   })
@@ -576,12 +569,7 @@ export default function Home() {
                   </div>
                 )}
 
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">入力のヒント</p>
-                  <p className="text-sm text-muted-foreground">
-                    入学・卒業の区分と年／月を揃えて入力すると並び替えや確認がしやすくなります。学校名には学部や学科まで記載すると、経歴がより伝わりやすくなります。
-                  </p>
-                </div>
+                <div className="space-y-1"></div>
               </div>
             </CardContent>
           </Card>
@@ -590,9 +578,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle>職歴（任意）</CardTitle>
-              <CardDescription>
-                これまでの職歴を追加できます。入社・退社の情報を入力してください。
-              </CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
@@ -642,10 +628,7 @@ export default function Home() {
                         </div>
 
                         <div className="grid gap-2">
-                          <Label className="flex items-center justify-between">
-                            <span>退社年月</span>
-                            <span className="text-xs text-muted-foreground">在籍状況</span>
-                          </Label>
+                          <Label>退社年月</Label>
                           <div className="grid grid-cols-2 gap-2">
                             <Input
                               type="number"
@@ -715,8 +698,8 @@ export default function Home() {
                 onClick={() =>
                   appendWorkHistory({
                     id: crypto.randomUUID(),
-                    entryYear: new Date().getFullYear(),
-                    entryMonth: 4,
+                    entryYear: undefined,
+                    entryMonth: undefined,
                     companyName: "",
                     status: "employed",
                   })
@@ -792,8 +775,8 @@ export default function Home() {
                 onClick={() =>
                   appendQualification({
                     id: crypto.randomUUID(),
-                    year: new Date().getFullYear(),
-                    month: 4,
+                    year: undefined,
+                    month: undefined,
                     name: "",
                   })
                 }

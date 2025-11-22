@@ -43,6 +43,10 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
 
     const educationRows = (data.education ?? []).flatMap((edu) => {
       const rows: { id: string; year: string | number; month: string | number; text: string }[] = [];
+      if (typeof edu.entryYear !== "number" || typeof edu.entryMonth !== "number") {
+        return rows;
+      }
+
       const entryEra = convertToEra(edu.entryYear, edu.entryMonth, 1);
       rows.push({
         id: `${edu.id}-entry`,
@@ -73,6 +77,10 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
 
     const workHistoryRows = (data.workHistory ?? []).flatMap((work) => {
       const rows: { id: string; year: string | number; month: string | number; text: string; description?: string }[] = [];
+      if (typeof work.entryYear !== "number" || typeof work.entryMonth !== "number") {
+        return rows;
+      }
+
       const entryEra = convertToEra(work.entryYear, work.entryMonth, 1);
       rows.push({
         id: `${work.id}-entry`,
@@ -193,11 +201,11 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
             {/* 連絡先 */}
             <tr>
               <td className="border border-black bg-gray-100 p-1 text-xs">電話番号</td>
-              <td className="border border-black p-2 text-sm" colSpan={2}>
+              <td className="border border-black p-2 text-sm" colSpan={1}>
                 {data.phone || ""}
               </td>
               <td className="border border-black bg-gray-100 p-1 text-xs">メール</td>
-              <td className="border border-black p-2 text-sm break-all">
+              <td className="border border-black p-2 text-sm break-all" colSpan={2}>
                 {data.email || ""}
               </td>
             </tr>

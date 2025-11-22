@@ -39,24 +39,50 @@ export const resumeSchema = z.object({
       z.object({
         id: z.string(),
         schoolName: z.string().min(1, "学校名を入力してください"),
-        entryYear: z.number(),
-        entryMonth: z.number(),
+        entryYear: z.number().optional(),
+        entryMonth: z.number().optional(),
         status: z.enum(["graduated", "withdrawn", "completed", "enrolled"]),
         completionYear: z.number().optional(),
         completionMonth: z.number().optional(),
       })
     )
-    .refine(
-      (entries) =>
-        entries.every((entry) => {
-          if (entry.status === "enrolled") return true;
-          return typeof entry.completionYear === "number" && typeof entry.completionMonth === "number";
-        }),
-      {
-        message: "卒業・中退・修了を選択した場合は終了年月を入力してください",
-        path: ["education"],
-      }
-    )
+    .superRefine((entries, ctx) => {
+      entries.forEach((entry, index) => {
+        if (typeof entry.entryYear !== "number" || Number.isNaN(entry.entryYear)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "入学年を入力してください",
+            path: [index, "entryYear"],
+          });
+        }
+
+        if (typeof entry.entryMonth !== "number" || Number.isNaN(entry.entryMonth)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "入学月を入力してください",
+            path: [index, "entryMonth"],
+          });
+        }
+
+        if (entry.status !== "enrolled") {
+          if (typeof entry.completionYear !== "number" || Number.isNaN(entry.completionYear)) {
+            ctx.addIssue({
+              code: "custom",
+              message: "終了年を入力してください",
+              path: [index, "completionYear"],
+            });
+          }
+
+          if (typeof entry.completionMonth !== "number" || Number.isNaN(entry.completionMonth)) {
+            ctx.addIssue({
+              code: "custom",
+              message: "終了月を入力してください",
+              path: [index, "completionMonth"],
+            });
+          }
+        }
+      });
+    })
     .optional(),
 
   workHistory: z
@@ -64,25 +90,51 @@ export const resumeSchema = z.object({
       z.object({
         id: z.string(),
         companyName: z.string().min(1, "会社名を入力してください"),
-        entryYear: z.number(),
-        entryMonth: z.number(),
+        entryYear: z.number().optional(),
+        entryMonth: z.number().optional(),
         status: z.enum(["employed", "resigned"]),
         exitYear: z.number().optional(),
         exitMonth: z.number().optional(),
         description: z.string().optional(),
       })
     )
-    .refine(
-      (entries) =>
-        entries.every((entry) => {
-          if (entry.status === "employed") return true;
-          return typeof entry.exitYear === "number" && typeof entry.exitMonth === "number";
-        }),
-      {
-        message: "退社を選択した場合は退社年月を入力してください",
-        path: ["workHistory"],
-      }
-    )
+    .superRefine((entries, ctx) => {
+      entries.forEach((entry, index) => {
+        if (typeof entry.entryYear !== "number" || Number.isNaN(entry.entryYear)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "入社年を入力してください",
+            path: [index, "entryYear"],
+          });
+        }
+
+        if (typeof entry.entryMonth !== "number" || Number.isNaN(entry.entryMonth)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "入社月を入力してください",
+            path: [index, "entryMonth"],
+          });
+        }
+
+        if (entry.status === "resigned") {
+          if (typeof entry.exitYear !== "number" || Number.isNaN(entry.exitYear)) {
+            ctx.addIssue({
+              code: "custom",
+              message: "退社年を入力してください",
+              path: [index, "exitYear"],
+            });
+          }
+
+          if (typeof entry.exitMonth !== "number" || Number.isNaN(entry.exitMonth)) {
+            ctx.addIssue({
+              code: "custom",
+              message: "退社月を入力してください",
+              path: [index, "exitMonth"],
+            });
+          }
+        }
+      });
+    })
     .optional(),
 
   selfPR: z.string().optional(),
@@ -92,11 +144,30 @@ export const resumeSchema = z.object({
     .array(
       z.object({
         id: z.string(),
-        year: z.number(),
-        month: z.number(),
+        year: z.number().optional(),
+        month: z.number().optional(),
         name: z.string(),
       })
     )
+    .superRefine((entries, ctx) => {
+      entries.forEach((entry, index) => {
+        if (typeof entry.year !== "number" || Number.isNaN(entry.year)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "取得年を入力してください",
+            path: [index, "year"],
+          });
+        }
+
+        if (typeof entry.month !== "number" || Number.isNaN(entry.month)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "取得月を入力してください",
+            path: [index, "month"],
+          });
+        }
+      });
+    })
     .optional(),
 
   remarks: z.string().optional(),

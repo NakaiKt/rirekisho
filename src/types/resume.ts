@@ -37,8 +37,8 @@ export interface ResumeFormData {
 export interface EducationEntry {
   id: string;
   schoolName: string;
-  entryYear: number;
-  entryMonth: number;
+  entryYear?: number;
+  entryMonth?: number;
   status: "graduated" | "withdrawn" | "completed" | "enrolled";
   completionYear?: number;
   completionMonth?: number;
@@ -47,8 +47,8 @@ export interface EducationEntry {
 export interface WorkHistoryEntry {
   id: string;
   companyName: string;
-  entryYear: number;
-  entryMonth: number;
+  entryYear?: number;
+  entryMonth?: number;
   status: "employed" | "resigned";
   exitYear?: number;
   exitMonth?: number;
@@ -57,7 +57,7 @@ export interface WorkHistoryEntry {
 
 export interface QualificationEntry {
   id: string;
-  year: number;
-  month: number;
+  year?: number;
+  month?: number;
   name: string;
 }
