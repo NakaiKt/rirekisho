@@ -6,7 +6,8 @@ export async function generateResumePDF(element: HTMLElement): Promise<void> {
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 0;
+    const margin = 10; // 10mm margins on all sides
+    const usableWidth = pageWidth - margin * 2;
     const usableHeight = pageHeight - margin * 2;
 
     // Find all sections marked with data-pdf-section
@@ -23,20 +24,20 @@ export async function generateResumePDF(element: HTMLElement): Promise<void> {
       });
 
       const imageData = canvas.toDataURL("image/png");
-      const imageWidth = pageWidth;
+      const imageWidth = usableWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
-      let position = 0;
+      let position = margin;
       let heightLeft = imageHeight;
 
-      pdf.addImage(imageData, "PNG", 0, position, imageWidth, imageHeight);
-      heightLeft -= pageHeight;
+      pdf.addImage(imageData, "PNG", margin, position, imageWidth, imageHeight);
+      heightLeft -= usableHeight;
 
       while (heightLeft > 0) {
-        position -= pageHeight;
+        position -= usableHeight;
         pdf.addPage();
-        pdf.addImage(imageData, "PNG", 0, position, imageWidth, imageHeight);
-        heightLeft -= pageHeight;
+        pdf.addImage(imageData, "PNG", margin, position + margin, imageWidth, imageHeight);
+        heightLeft -= usableHeight;
       }
     } else {
       // Process each section individually
@@ -54,7 +55,7 @@ export async function generateResumePDF(element: HTMLElement): Promise<void> {
         });
 
         const imageData = canvas.toDataURL("image/png");
-        const imageWidth = pageWidth - margin * 2;
+        const imageWidth = usableWidth;
         const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
         // Check if section fits on current page
