@@ -103,7 +103,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
       <div
         ref={ref}
         className="bg-white p-8 w-[210mm] min-h-[297mm] mx-auto text-black"
-        style={{ fontFamily: "'Noto Sans JP', sans-serif", pageBreakInside: "avoid", breakInside: "avoid" }}
+        style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
       >
         {/* タイトル */}
         <h1 className="text-3xl font-bold text-center mb-6 tracking-widest">履 歴 書</h1>
@@ -114,9 +114,9 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
         </div>
 
         {/* 基本情報テーブル */}
+        <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
         <table
           className="w-full border-collapse border-2 border-black mb-4"
-          style={{ pageBreakInside: "avoid", breakInside: "avoid" }}
         >
           <tbody>
             {/* ふりがな */}
@@ -205,11 +205,12 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
             </tr>
           </tbody>
         </table>
+        </div>
 
         {/* 学歴・職歴 */}
+        <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
         <table
           className="w-full border-collapse border-2 border-black mb-4"
-          style={{ pageBreakInside: "avoid", breakInside: "avoid" }}
         >
           <thead>
             <tr>
@@ -264,12 +265,13 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
             ) : null}
           </tbody>
         </table>
+        </div>
 
         {/* 資格・免許 */}
         {data.qualifications && data.qualifications.length > 0 && (
+          <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
           <table
             className="w-full border-collapse border-2 border-black mb-4"
-            style={{ pageBreakInside: "avoid", breakInside: "avoid" }}
           >
             <thead>
               <tr>
@@ -298,13 +300,14 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
               })}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* 志望動機・自己PR */}
         {(data.motivation || data.selfPR) && (
+          <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
           <table
             className="w-full border-collapse border-2 border-black mb-4"
-            style={{ pageBreakInside: "avoid", breakInside: "avoid" }}
           >
             <tbody>
               {data.motivation && (
@@ -329,13 +332,14 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
               )}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* 本人希望欄 */}
         {data.remarks && (
+          <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
           <table
             className="w-full border-collapse border-2 border-black"
-            style={{ pageBreakInside: "avoid", breakInside: "avoid" }}
           >
             <tbody>
               <tr>
@@ -348,6 +352,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
               </tr>
             </tbody>
           </table>
+          </div>
         )}
       </div>
     );
