@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
+import type { HTMLOptions } from "jspdf";
 
-type HtmlOptionsWithPageBreak = jsPDF.HTMLOptions & {
+type HtmlOptionsWithPageBreak = HTMLOptions & {
   pagebreak?: {
     mode?: Array<"avoid-all" | "css" | "legacy">;
   };
