@@ -65,6 +65,8 @@ export default function Home() {
   const selfPRValue = watch("selfPR") || "";
   const motivationValue = watch("motivation") || "";
   const remarksValue = watch("remarks") || "";
+  const postalCodeValue = watch("postalCode") || "";
+  const isPostalCodeComplete = postalCodeValue.replace(/-/g, "").length === 7;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [postalLookupMessage, setPostalLookupMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -99,7 +101,7 @@ export default function Home() {
 
   // 郵便番号から住所を自動入力
   const handlePostalLookup = () => {
-    const postalCode = watch("postalCode");
+    const postalCode = postalCodeValue;
     setPostalLookupMessage(null);
     if (!postalCode || postalCode.replace(/-/g, "").length !== 7) {
       setPostalLookupMessage("郵便番号は7桁で入力してください。");
@@ -342,12 +344,19 @@ export default function Home() {
                       setValue("postalCode", formatted);
                     }}
                   />
-                  <Button type="button" variant="outline" onClick={handlePostalLookup}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePostalLookup}
+                    disabled={!isPostalCodeComplete}
+                  >
                     住所を自動入力
                   </Button>
                 </div>
                 {postalLookupMessage && (
-                  <p className="text-sm text-muted-foreground">{postalLookupMessage}</p>
+                  <p className="text-sm text-muted-foreground" aria-live="polite">
+                    {postalLookupMessage}
+                  </p>
                 )}
               </div>
 
@@ -817,12 +826,16 @@ export default function Home() {
 
           {/* 提出ボタン */}
           <div className="flex flex-col gap-3 pt-6">
-            {submitError && <p className="text-center text-sm text-red-500">{submitError}</p>}
+            {submitError && (
+              <p className="text-center text-sm text-red-500" aria-live="assertive">
+                {submitError}
+              </p>
+            )}
             <div className="flex justify-center">
-            <Button type="submit" size="lg" className="w-full md:w-auto px-12">
-              <FileText className="w-5 h-5 mr-2" />
-              履歴書を作成する
-            </Button>
+              <Button type="submit" size="lg" className="w-full md:w-auto px-12">
+                <FileText className="w-5 h-5 mr-2" />
+                履歴書を作成する
+              </Button>
             </div>
           </div>
         </form>
