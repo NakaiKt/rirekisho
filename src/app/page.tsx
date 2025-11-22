@@ -137,7 +137,7 @@ export default function Home() {
   };
 
   // PDF生成
-  const onSubmit = async () => {
+  const onSubmit = async (_data: ResumeFormData) => {
     if (!resumePreviewRef.current) {
       alert("プレビューの生成に失敗しました。");
       return;
@@ -146,7 +146,7 @@ export default function Home() {
     setIsGenerating(true);
     try {
       setSubmitError(null);
-      await generateResumePDF(data);
+      await generateResumePDF(resumePreviewRef.current);
     } catch (error) {
       console.error("PDF生成に失敗しました:", error);
       alert("PDF生成に失敗しました。もう一度お試しください。");
