@@ -125,7 +125,6 @@ export default function Home() {
       setValue("prefecture", result.prefecture);
       setValue("city", result.city);
       setValue("address", result.address);
-      setPostalLookupMessage("住所を自動入力しました。");
     } else {
       setPostalLookupMessage("住所を見つけられませんでした。手入力してください。");
     }
@@ -267,7 +266,6 @@ export default function Home() {
                     }}
                     className={`font-mono ${errors.birthDate ? "border-red-500" : ""}`}
                   />
-                  <p className="text-sm text-muted-foreground">スラッシュは自動で挿入されます。</p>
                 </div>
                 {errors.birthDate && (
                   <p className="text-sm text-red-500">{errors.birthDate.message}</p>
@@ -341,7 +339,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle>連絡先（任意）</CardTitle>
               <CardDescription>
-                日本国内の郵便番号を入力すると住所を自動入力します（海外住所は手入力してください）。
+                日本国内の郵便番号を入力すると住所を自動入力します。
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -460,14 +458,6 @@ export default function Home() {
                         <Trash2 className="w-4 h-4" />
                       </Button>
 
-                      <div className="space-y-2">
-                        <Label>学校名</Label>
-                        <Input
-                          {...register(`education.${index}.schoolName` as const)}
-                          placeholder="○○大学 △△学部"
-                        />
-                      </div>
-
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label>入学年月</Label>
@@ -491,10 +481,45 @@ export default function Home() {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>卒業・修了区分</Label>
+                        <div className="grid gap-2">
+                          <Label className="flex items-center justify-between">
+                            <span>終了年月</span>
+                            <span className="text-xs text-muted-foreground">卒業・修了区分</span>
+                          </Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              placeholder="2024"
+                              disabled={status === "enrolled"}
+                              {...register(`education.${index}.completionYear` as const, {
+                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
+                              })}
+                            />
+                            <Input
+                              type="number"
+                              placeholder="3"
+                              min="1"
+                              max="12"
+                              disabled={status === "enrolled"}
+                              {...register(`education.${index}.completionMonth` as const, {
+                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
+                              })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 md:col-span-2">
                           <select
-                            {...register(`education.${index}.status` as const)}
+                            {...register(`education.${index}.status` as const, {
+                              onChange: (e) => {
+                                const value = e.target.value as ResumeFormData["education"][number]["status"];
+                                setValue(`education.${index}.status` as const, value);
+                                if (value === "enrolled") {
+                                  setValue(`education.${index}.completionYear` as const, undefined);
+                                  setValue(`education.${index}.completionMonth` as const, undefined);
+                                }
+                              },
+                            })}
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                           >
                             <option value="graduated">卒業</option>
@@ -505,29 +530,13 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {status !== "enrolled" && (
-                        <div className="space-y-2">
-                          <Label>終了年月</Label>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Input
-                              type="number"
-                              placeholder="2024"
-                              {...register(`education.${index}.completionYear` as const, {
-                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
-                              })}
-                            />
-                            <Input
-                              type="number"
-                              placeholder="3"
-                              min="1"
-                              max="12"
-                              {...register(`education.${index}.completionMonth` as const, {
-                                setValueAs: (value) => (value === "" ? undefined : Number(value)),
-                              })}
-                            />
-                          </div>
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label>学校名</Label>
+                        <Input
+                          {...register(`education.${index}.schoolName` as const)}
+                          placeholder="○○大学 △△学部"
+                        />
+                      </div>
                     </div>
                   );
                 })}
@@ -606,14 +615,6 @@ export default function Home() {
                         <Trash2 className="w-4 h-4" />
                       </Button>
 
-                      <div className="space-y-2">
-                        <Label>会社名</Label>
-                        <Input
-                          {...register(`workHistory.${index}.companyName` as const)}
-                          placeholder="株式会社○○"
-                        />
-                      </div>
-
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label>入社年月</Label>
@@ -637,25 +638,16 @@ export default function Home() {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>在籍状況</Label>
-                          <select
-                            {...register(`workHistory.${index}.status` as const)}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          >
-                            <option value="employed">在職中</option>
-                            <option value="resigned">退社</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {status === "resigned" && (
-                        <div className="space-y-2">
-                          <Label>退社年月</Label>
+                        <div className="grid gap-2">
+                          <Label className="flex items-center justify-between">
+                            <span>退社年月</span>
+                            <span className="text-xs text-muted-foreground">在籍状況</span>
+                          </Label>
                           <div className="grid grid-cols-2 gap-2">
                             <Input
                               type="number"
                               placeholder="2024"
+                              disabled={status === "employed"}
                               {...register(`workHistory.${index}.exitYear` as const, {
                                 setValueAs: (value) => (value === "" ? undefined : Number(value)),
                               })}
@@ -665,13 +657,41 @@ export default function Home() {
                               placeholder="3"
                               min="1"
                               max="12"
+                              disabled={status === "employed"}
                               {...register(`workHistory.${index}.exitMonth` as const, {
                                 setValueAs: (value) => (value === "" ? undefined : Number(value)),
                               })}
                             />
                           </div>
                         </div>
-                      )}
+
+                        <div className="space-y-2 md:col-span-2">
+                          <select
+                            {...register(`workHistory.${index}.status` as const, {
+                              onChange: (e) => {
+                                const value = e.target.value as WorkStatus;
+                                setValue(`workHistory.${index}.status` as const, value);
+                                if (value === "employed") {
+                                  setValue(`workHistory.${index}.exitYear` as const, undefined);
+                                  setValue(`workHistory.${index}.exitMonth` as const, undefined);
+                                }
+                              },
+                            })}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          >
+                            <option value="employed">在職中</option>
+                            <option value="resigned">退社</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>会社名</Label>
+                        <Input
+                          {...register(`workHistory.${index}.companyName` as const)}
+                          placeholder="株式会社○○"
+                        />
+                      </div>
 
                       <div className="space-y-2">
                         <Label>業務内容（任意）</Label>

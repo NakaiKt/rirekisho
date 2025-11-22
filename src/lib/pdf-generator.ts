@@ -1,3 +1,4 @@
+import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 export async function generateResumePDF(element: HTMLElement): Promise<void> {
@@ -8,15 +9,31 @@ export async function generateResumePDF(element: HTMLElement): Promise<void> {
       format: "a4",
     });
 
-    await pdf.html(element, {
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      },
-      autoPaging: "text",
-      margin: [10, 10, 10, 10],
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      windowWidth: element.scrollWidth,
     });
+
+    const imgData = canvas.toDataURL("image/png");
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    let heightLeft = pdfHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight, undefined, "FAST");
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - pdfHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight, undefined, "FAST");
+      heightLeft -= pageHeight;
+    }
 
     const pdfBlob = pdf.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
