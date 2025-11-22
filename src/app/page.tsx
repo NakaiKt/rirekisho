@@ -439,7 +439,7 @@ export default function Home() {
                 {educationFields.map((field, index) => {
                   const status =
                     (watch(`education.${index}.status` as const) as
-                      | ResumeFormData["education"][number]["status"]
+                      | NonNullable<ResumeFormData["education"]>[number]["status"]
                       | undefined) ||
                     field.status ||
                     "graduated";
