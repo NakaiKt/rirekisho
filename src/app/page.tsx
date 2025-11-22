@@ -512,7 +512,10 @@ export default function Home() {
                           <select
                             {...register(`education.${index}.status` as const, {
                               onChange: (e) => {
-                                const value = e.target.value as ResumeFormData["education"][number]["status"];
+                                const value =
+                                  e.target.value as NonNullable<
+                                    ResumeFormData["education"]
+                                  >[number]["status"];
                                 setValue(`education.${index}.status` as const, value);
                                 if (value === "enrolled") {
                                   setValue(`education.${index}.completionYear` as const, undefined);
