@@ -4,9 +4,18 @@ export const resumeSchema = z.object({
   // 必須項目
   name: z.string().min(1, "お名前は必須です"),
   furigana: z.string().min(1, "ふりがなは必須です"),
-  birthYear: z.number().min(1900, "正しい年を入力してください").max(new Date().getFullYear(), "正しい年を入力してください"),
-  birthMonth: z.number().min(1, "月は1〜12で入力してください").max(12, "月は1〜12で入力してください"),
-  birthDay: z.number().min(1, "日は1〜31で入力してください").max(31, "日は1〜31で入力してください"),
+  birthYear: z
+    .number({ invalid_type_error: "数字を入力してください" })
+    .min(1900, "正しい年を入力してください")
+    .max(new Date().getFullYear(), "正しい年を入力してください"),
+  birthMonth: z
+    .number({ invalid_type_error: "数字を入力してください" })
+    .min(1, "月は1〜12で入力してください")
+    .max(12, "月は1〜12で入力してください"),
+  birthDay: z
+    .number({ invalid_type_error: "数字を入力してください" })
+    .min(1, "日は1〜31で入力してください")
+    .max(31, "日は1〜31で入力してください"),
   gender: z.enum(["male", "female"], {
     required_error: "性別を選択してください",
   }),

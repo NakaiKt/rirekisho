@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResumeFormData, resumeSchema } from "@/lib/validation";
@@ -62,6 +62,12 @@ export default function Home() {
 
   // フォームの値を監視してローカルストレージに保存
   const formValues = watch();
+  const selfPRValue = watch("selfPR") || "";
+  const motivationValue = watch("motivation") || "";
+  const remarksValue = watch("remarks") || "";
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [postalLookupMessage, setPostalLookupMessage] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
     // 初回ロード時にローカルストレージから復元
@@ -92,17 +98,24 @@ export default function Home() {
       : null;
 
   // 郵便番号から住所を自動入力
-  const postalCode = watch("postalCode");
-  useEffect(() => {
-    if (postalCode && postalCode.replace(/-/g, "").length === 7) {
-      const result = searchPostalCode(postalCode);
-      if (result) {
-        setValue("prefecture", result.prefecture);
-        setValue("city", result.city);
-        setValue("address", result.address);
-      }
+  const handlePostalLookup = () => {
+    const postalCode = watch("postalCode");
+    setPostalLookupMessage(null);
+    if (!postalCode || postalCode.replace(/-/g, "").length !== 7) {
+      setPostalLookupMessage("郵便番号は7桁で入力してください。");
+      return;
     }
-  }, [postalCode, setValue]);
+
+    const result = searchPostalCode(postalCode);
+    if (result) {
+      setValue("prefecture", result.prefecture);
+      setValue("city", result.city);
+      setValue("address", result.address);
+      setPostalLookupMessage("住所を自動入力しました。");
+    } else {
+      setPostalLookupMessage("住所を見つけられませんでした。手入力してください。");
+    }
+  };
 
   // 写真のアップロード処理
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,11 +132,20 @@ export default function Home() {
   // PDF生成
   const onSubmit = async (data: ResumeFormData) => {
     try {
+      setSubmitError(null);
       await generateResumePDF(data);
     } catch (error) {
       console.error("PDF generation failed:", error);
       alert("PDF生成に失敗しました。もう一度お試しください。");
     }
+  };
+
+  const onError = () => {
+    setSubmitError("未入力または不正な項目があります。赤枠の入力欄を確認してください。");
+    const firstErrorElement =
+      formRef.current?.querySelector<HTMLElement>("[aria-invalid='true']");
+    firstErrorElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+    firstErrorElement?.focus();
   };
 
   return (
@@ -146,7 +168,7 @@ export default function Home() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form ref={formRef} onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
           {/* 基本情報 */}
           <Card>
             <CardHeader>
@@ -155,13 +177,14 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* 名前 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">
                     お名前 <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="name"
+                    aria-invalid={!!errors.name}
                     {...register("name")}
                     placeholder="山田 太郎"
                     className={errors.name ? "border-red-500" : ""}
@@ -177,6 +200,7 @@ export default function Home() {
                   </Label>
                   <Input
                     id="furigana"
+                    aria-invalid={!!errors.furigana}
                     {...register("furigana")}
                     placeholder="やまだ たろう"
                     className={errors.furigana ? "border-red-500" : ""}
@@ -198,6 +222,7 @@ export default function Home() {
                       type="number"
                       {...register("birthYear", { valueAsNumber: true })}
                       placeholder="1990"
+                      aria-invalid={!!errors.birthYear}
                       className={errors.birthYear ? "border-red-500" : ""}
                     />
                     <span className="text-sm text-muted-foreground">年</span>
@@ -209,6 +234,7 @@ export default function Home() {
                       placeholder="1"
                       min="1"
                       max="12"
+                      aria-invalid={!!errors.birthMonth}
                       className={errors.birthMonth ? "border-red-500" : ""}
                     />
                     <span className="text-sm text-muted-foreground">月</span>
@@ -220,6 +246,7 @@ export default function Home() {
                       placeholder="1"
                       min="1"
                       max="31"
+                      aria-invalid={!!errors.birthDay}
                       className={errors.birthDay ? "border-red-500" : ""}
                     />
                     <span className="text-sm text-muted-foreground">日</span>
@@ -234,21 +261,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* 学歴自動計算の表示 */}
-              {schoolSchedule && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                  <p className="text-sm font-medium text-blue-900">
-                    ストレート卒業の場合の学歴目安
-                  </p>
-                  <div className="text-sm text-blue-800 space-y-1">
-                    <p>小学校: {schoolSchedule.elementary.entry} 入学 → {schoolSchedule.elementary.graduation} 卒業</p>
-                    <p>中学校: {schoolSchedule.juniorHigh.entry} 入学 → {schoolSchedule.juniorHigh.graduation} 卒業</p>
-                    <p>高校: {schoolSchedule.high.entry} 入学 → {schoolSchedule.high.graduation} 卒業</p>
-                    <p>大学: {schoolSchedule.university.entry} 入学 → {schoolSchedule.university.graduation} 卒業</p>
-                  </div>
-                </div>
-              )}
-
               {/* 性別 */}
               <div className="space-y-2">
                 <Label>
@@ -256,6 +268,7 @@ export default function Home() {
                 </Label>
                 <RadioGroup
                   defaultValue={formValues.gender}
+                  aria-invalid={!!errors.gender}
                   onValueChange={(value) => setValue("gender", value as "male" | "female")}
                 >
                   <div className="flex items-center space-x-4">
@@ -318,16 +331,24 @@ export default function Home() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="postalCode">郵便番号</Label>
-                <Input
-                  id="postalCode"
-                  {...register("postalCode")}
-                  placeholder="123-4567"
-                  maxLength={8}
-                  onChange={(e) => {
-                    const formatted = formatPostalCode(e.target.value);
-                    setValue("postalCode", formatted);
-                  }}
-                />
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+                  <Input
+                    id="postalCode"
+                    {...register("postalCode")}
+                    placeholder="123-4567"
+                    maxLength={8}
+                    onChange={(e) => {
+                      const formatted = formatPostalCode(e.target.value);
+                      setValue("postalCode", formatted);
+                    }}
+                  />
+                  <Button type="button" variant="outline" onClick={handlePostalLookup}>
+                    住所を自動入力
+                  </Button>
+                </div>
+                {postalLookupMessage && (
+                  <p className="text-sm text-muted-foreground">{postalLookupMessage}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -385,117 +406,139 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* 学歴 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>学歴（任意）</CardTitle>
-              <CardDescription>
-                学校の入学・卒業情報を追加できます。上記の生年月日から自動計算された目安を参考にしてください。
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {educationFields.map((field, index) => (
-                <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2"
-                    onClick={() => removeEducation(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+          <div className="space-y-4 lg:grid lg:grid-cols-[1.6fr,1fr] lg:gap-6 lg:items-start lg:space-y-0">
+            <Card>
+              <CardHeader>
+                <CardTitle>学歴（任意）</CardTitle>
+                <CardDescription>
+                  学校の入学・卒業情報を追加できます。上記の生年月日から自動計算された目安を参考にしてください。
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {educationFields.map((field, index) => (
+                  <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={() => removeEducation(index)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label>年</Label>
-                      <Input
-                        type="number"
-                        {...register(`education.${index}.year` as const, {
-                          valueAsNumber: true,
-                        })}
-                        placeholder="2020"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>月</Label>
-                      <Input
-                        type="number"
-                        {...register(`education.${index}.month` as const, {
-                          valueAsNumber: true,
-                        })}
-                        placeholder="4"
-                        min="1"
-                        max="12"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>入学/卒業</Label>
-                      <RadioGroup
-                        defaultValue={field.type}
-                        onValueChange={(value) =>
-                          setValue(`education.${index}.type`, value as "entry" | "graduation")
-                        }
-                      >
-                        <div className="flex space-x-2">
-                          <div className="flex items-center space-x-1">
-                            <RadioGroupItem
-                              value="entry"
-                              id={`education-${index}-entry`}
-                            />
-                            <Label
-                              htmlFor={`education-${index}-entry`}
-                              className="font-normal cursor-pointer text-sm"
-                            >
-                              入学
-                            </Label>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>年</Label>
+                        <Input
+                          type="number"
+                          {...register(`education.${index}.year` as const, {
+                            valueAsNumber: true,
+                          })}
+                          placeholder="2020"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>月</Label>
+                        <Input
+                          type="number"
+                          {...register(`education.${index}.month` as const, {
+                            valueAsNumber: true,
+                          })}
+                          placeholder="4"
+                          min="1"
+                          max="12"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>入学/卒業</Label>
+                        <RadioGroup
+                          defaultValue={field.type}
+                          onValueChange={(value) =>
+                            setValue(`education.${index}.type`, value as "entry" | "graduation")
+                          }
+                        >
+                          <div className="flex space-x-2">
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem
+                                value="entry"
+                                id={`education-${index}-entry`}
+                              />
+                              <Label
+                                htmlFor={`education-${index}-entry`}
+                                className="font-normal cursor-pointer text-sm"
+                              >
+                                入学
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem
+                                value="graduation"
+                                id={`education-${index}-graduation`}
+                              />
+                              <Label
+                                htmlFor={`education-${index}-graduation`}
+                                className="font-normal cursor-pointer text-sm"
+                              >
+                                卒業
+                              </Label>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <RadioGroupItem
-                              value="graduation"
-                              id={`education-${index}-graduation`}
-                            />
-                            <Label
-                              htmlFor={`education-${index}-graduation`}
-                              className="font-normal cursor-pointer text-sm"
-                            >
-                              卒業
-                            </Label>
-                          </div>
-                        </div>
-                      </RadioGroup>
+                        </RadioGroup>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>学校名</Label>
+                      <Input
+                        {...register(`education.${index}.schoolName` as const)}
+                        placeholder="○○大学 △△学部"
+                      />
                     </div>
                   </div>
+                ))}
 
-                  <div className="space-y-2">
-                    <Label>学校名</Label>
-                    <Input
-                      {...register(`education.${index}.schoolName` as const)}
-                      placeholder="○○大学 △△学部"
-                    />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    appendEducation({
+                      id: crypto.randomUUID(),
+                      year: new Date().getFullYear(),
+                      month: 4,
+                      schoolName: "",
+                      type: "entry",
+                    })
+                  }
+                  className="w-full"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  学歴を追加
+                </Button>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-4">
+              {schoolSchedule && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                  <p className="text-sm font-medium text-blue-900">学歴目安</p>
+                  <div className="text-sm text-blue-800 space-y-1">
+                    <p>小学校: {schoolSchedule.elementary.entry} 入学 → {schoolSchedule.elementary.graduation} 卒業</p>
+                    <p>中学校: {schoolSchedule.juniorHigh.entry} 入学 → {schoolSchedule.juniorHigh.graduation} 卒業</p>
+                    <p>高校: {schoolSchedule.high.entry} 入学 → {schoolSchedule.high.graduation} 卒業</p>
+                    <p>大学: {schoolSchedule.university.entry} 入学 → {schoolSchedule.university.graduation} 卒業</p>
                   </div>
                 </div>
-              ))}
+              )}
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  appendEducation({
-                    id: crypto.randomUUID(),
-                    year: new Date().getFullYear(),
-                    month: 4,
-                    schoolName: "",
-                    type: "entry",
-                  })
-                }
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                学歴を追加
-              </Button>
-            </CardContent>
-          </Card>
+              <div className="bg-muted border rounded-lg p-4 space-y-2">
+                <p className="text-sm font-medium">入力のヒント</p>
+                <p className="text-sm text-muted-foreground">
+                  入学・卒業の区分と年／月を揃えて入力すると並び替えや確認がしやすくなります。学校名には学部や学科まで記載すると、経歴がより伝わりやすくなります。
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* 職歴 */}
           <Card>
@@ -695,6 +738,15 @@ export default function Home() {
           </Card>
 
           {/* 自己PR */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
+            <p className="font-medium mb-2">💡 自己PRの書き方のポイント</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>具体的なエピソードを交えて書く</li>
+              <li>数字や実績を盛り込むと説得力が増す</li>
+              <li>応募先企業で活かせる強みを強調する</li>
+              <li>200〜400字程度が目安</li>
+            </ul>
+          </div>
           <Card>
             <CardHeader>
               <CardTitle>自己PR（任意）</CardTitle>
@@ -702,15 +754,9 @@ export default function Home() {
                 あなたの強みや特技、これまでの経験をアピールしましょう。
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
-                <p className="font-medium mb-2">💡 自己PRの書き方のポイント</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>具体的なエピソードを交えて書く</li>
-                  <li>数字や実績を盛り込むと説得力が増す</li>
-                  <li>応募先企業で活かせる強みを強調する</li>
-                  <li>200〜400字程度が目安</li>
-                </ul>
+            <CardContent className="space-y-2">
+              <div className="flex justify-end text-sm text-muted-foreground">
+                文字数: {selfPRValue.length}
               </div>
               <Textarea
                 {...register("selfPR")}
@@ -721,6 +767,15 @@ export default function Home() {
           </Card>
 
           {/* 志望動機 */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
+            <p className="font-medium mb-2">💡 志望動機の書き方のポイント</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>企業研究を行い、その企業ならではの魅力を述べる</li>
+              <li>自分の経験やスキルと関連付ける</li>
+              <li>入社後にどう貢献したいかを具体的に書く</li>
+              <li>200〜400字程度が目安</li>
+            </ul>
+          </div>
           <Card>
             <CardHeader>
               <CardTitle>志望動機（任意）</CardTitle>
@@ -728,15 +783,9 @@ export default function Home() {
                 なぜこの企業・職種を志望するのか、あなたの思いを伝えましょう。
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
-                <p className="font-medium mb-2">💡 志望動機の書き方のポイント</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>企業研究を行い、その企業ならではの魅力を述べる</li>
-                  <li>自分の経験やスキルと関連付ける</li>
-                  <li>入社後にどう貢献したいかを具体的に書く</li>
-                  <li>200〜400字程度が目安</li>
-                </ul>
+            <CardContent className="space-y-2">
+              <div className="flex justify-end text-sm text-muted-foreground">
+                文字数: {motivationValue.length}
               </div>
               <Textarea
                 {...register("motivation")}
@@ -754,7 +803,10 @@ export default function Home() {
                 勤務時間、勤務地、その他特記事項があれば記入してください。
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-2">
+              <div className="flex justify-end text-sm text-muted-foreground">
+                文字数: {remarksValue.length}
+              </div>
               <Textarea
                 {...register("remarks")}
                 placeholder="例：勤務地は東京都内を希望します。"
@@ -764,11 +816,14 @@ export default function Home() {
           </Card>
 
           {/* 提出ボタン */}
-          <div className="flex justify-center pt-6">
+          <div className="flex flex-col gap-3 pt-6">
+            {submitError && <p className="text-center text-sm text-red-500">{submitError}</p>}
+            <div className="flex justify-center">
             <Button type="submit" size="lg" className="w-full md:w-auto px-12">
               <FileText className="w-5 h-5 mr-2" />
               履歴書を作成する
             </Button>
+            </div>
           </div>
         </form>
 
