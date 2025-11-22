@@ -291,7 +291,10 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
             </thead>
             <tbody>
               {data.qualifications.map((qual) => {
-                const qualEra = convertToEra(qual.year, qual.month, 1);
+                const qualEra =
+                  qual.year !== undefined && qual.month !== undefined
+                    ? convertToEra(qual.year, qual.month, 1)
+                    : undefined;
                 return (
                   <tr key={qual.id}>
                     <td className="border border-black p-2 text-sm text-center">
