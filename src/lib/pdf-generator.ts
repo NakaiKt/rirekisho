@@ -1,7 +1,7 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-export async function generateResumePDF(element: HTMLElement): Promise<void> {
+export async function generatePDF(element: HTMLElement, filename: string = "document"): Promise<void> {
   try {
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -119,4 +119,14 @@ export async function generateResumePDF(element: HTMLElement): Promise<void> {
     console.error("PDF生成に失敗しました:", error);
     throw new Error("PDF生成に失敗しました。もう一度お試しください。");
   }
+}
+
+// 履歴書用のPDF生成関数（後方互換性のため）
+export async function generateResumePDF(element: HTMLElement): Promise<void> {
+  return generatePDF(element, "rirekisho");
+}
+
+// 職務経歴書用のPDF生成関数
+export async function generateCareerPDF(element: HTMLElement): Promise<void> {
+  return generatePDF(element, "shokumu-keirekisho");
 }
