@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FileText, Shield, Plus, Trash2 } from "lucide-react";
+import { FileText, Shield, Plus, Trash2, ArrowRight } from "lucide-react";
 import { calculateSchoolSchedule } from "@/lib/era-converter";
 import { searchPostalCode, formatPostalCode } from "@/lib/postal-code";
 import { generateResumePDF } from "@/lib/pdf-generator";
@@ -186,6 +187,16 @@ export default function Home() {
             <span>
               このサイトはWEB上で完結します。あなたの情報は端末の外に出ることはありません。
             </span>
+          </div>
+
+          {/* 職務経歴書へのリンク */}
+          <div className="mt-4">
+            <Link href="/career">
+              <Button variant="outline" size="sm">
+                職務経歴書ページへ
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
 
