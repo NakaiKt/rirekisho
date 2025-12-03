@@ -26,6 +26,7 @@ export default function Home() {
     watch,
     setValue,
     control,
+    reset,
     formState: { errors },
   } = useForm<ResumeFormData>({
     resolver: zodResolver(resumeSchema),
@@ -170,6 +171,83 @@ export default function Home() {
     firstErrorElement?.focus();
   };
 
+  // テスト用のサンプル入力（必要に応じて削除可能）
+  const handleFillSample = () => {
+    const sampleData: ResumeFormData = {
+      name: "山田 太郎",
+      furigana: "やまだ たろう",
+      birthDate: "1990/04/15",
+      gender: "male",
+      postalCode: "100-0001",
+      prefecture: "東京都",
+      city: "千代田区",
+      address: "千代田1-1",
+      building: "テストビル101号室",
+      email: "taro.yamada@example.com",
+      phone: "09012345678",
+      education: [
+        {
+          id: crypto.randomUUID(),
+          entryYear: 2006,
+          entryMonth: 4,
+          completionYear: 2009,
+          completionMonth: 3,
+          schoolName: "東京都立第一高等学校",
+          status: "graduated",
+        },
+        {
+          id: crypto.randomUUID(),
+          entryYear: 2009,
+          entryMonth: 4,
+          completionYear: 2013,
+          completionMonth: 3,
+          schoolName: "東京大学 経済学部",
+          status: "graduated",
+        },
+      ],
+      workHistory: [
+        {
+          id: crypto.randomUUID(),
+          entryYear: 2013,
+          entryMonth: 4,
+          exitYear: 2018,
+          exitMonth: 3,
+          companyName: "株式会社サンプル",
+          status: "resigned",
+        },
+        {
+          id: crypto.randomUUID(),
+          entryYear: 2018,
+          entryMonth: 4,
+          companyName: "ABCソリューションズ株式会社",
+          status: "employed",
+        },
+      ],
+      qualifications: [
+        {
+          id: crypto.randomUUID(),
+          year: 2012,
+          month: 9,
+          name: "TOEIC 900点",
+        },
+        {
+          id: crypto.randomUUID(),
+          year: 2015,
+          month: 12,
+          name: "基本情報技術者",
+        },
+      ],
+      selfPR:
+        "チームでの成果を重視し、課題解決のために主体的に動くことを心掛けています。",
+      motivation:
+        "SaaSプロダクトの成長に携わり、ユーザー価値を高めることに挑戦したいと考えています。",
+      remarks: "普通自動車第一種免許（2010年取得）",
+    };
+
+    reset(sampleData);
+    saveToLocalStorage(sampleData);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -190,7 +268,10 @@ export default function Home() {
           </div>
 
           {/* 職務経歴書へのリンク */}
-          <div className="mt-4">
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <Button variant="secondary" onClick={handleFillSample}>
+              サンプル入力
+            </Button>
             <Link href="/career">
               <Button variant="outline" size="sm">
                 職務経歴書ページへ
