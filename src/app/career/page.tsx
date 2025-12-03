@@ -38,6 +38,7 @@ export default function CareerPage() {
     watch,
     setValue,
     control,
+    reset,
     formState: { errors },
   } = useForm<CareerFormData>({
     resolver: zodResolver(careerSchema),
@@ -156,6 +157,81 @@ export default function CareerPage() {
     firstErrorElement?.focus();
   };
 
+  // テスト用のサンプル入力（必要に応じて削除可能）
+  const handleFillSample = () => {
+    const sampleData: CareerFormData = {
+      name: "山田 太郎",
+      furigana: "やまだ たろう",
+      birthDate: "1990/04/15",
+      gender: "male",
+      postalCode: "100-0001",
+      prefecture: "東京都",
+      city: "千代田区",
+      address: "千代田1-1",
+      building: "テストビル101号室",
+      email: "taro.yamada@example.com",
+      phone: "09012345678",
+      summary:
+        "法人営業とITプロジェクトマネジメントの経験を持ち、顧客課題のヒアリングから施策実行まで一貫して推進。",
+      careerHistory: [
+        {
+          id: crypto.randomUUID(),
+          companyName: "株式会社サンプル",
+          startYear: 2013,
+          startMonth: 4,
+          endYear: 2018,
+          endMonth: 3,
+          employmentType: "fullTime",
+          department: "営業部",
+          position: "主任",
+          jobDescription: "法人向けソリューション営業に従事し、新規開拓と既存顧客深耕を担当。",
+          achievements: "年間売上トップ10%を4年間維持。",
+          technologies: "Salesforce / Excel / PowerPoint",
+        },
+        {
+          id: crypto.randomUUID(),
+          companyName: "ABCソリューションズ株式会社",
+          startYear: 2018,
+          startMonth: 4,
+          employmentType: "fullTime",
+          department: "プロダクト開発部",
+          position: "プロジェクトマネージャー",
+          jobDescription: "SaaSプロダクトの企画から開発進行、リリース後の改善サイクルまでを統括。",
+          achievements: "月間アクティブユーザーを前年比20%向上。",
+          technologies: "TypeScript / React / AWS / Figma",
+        },
+      ],
+      skills: [
+        {
+          id: crypto.randomUUID(),
+          category: "言語/フレームワーク",
+          skillName: "TypeScript",
+          level: "advanced",
+          experience: "5年",
+        },
+        {
+          id: crypto.randomUUID(),
+          category: "プロジェクト管理",
+          skillName: "Scrum / アジャイル開発",
+          level: "advanced",
+          experience: "4年",
+        },
+        {
+          id: crypto.randomUUID(),
+          category: "デザイン/ドキュメント",
+          skillName: "Figma / Notion",
+          level: "intermediate",
+          experience: "3年",
+        },
+      ],
+      selfPR:
+        "エンジニアやデザイナーと連携し、プロダクトの価値を高めるコミュニケーションに強みがあります。",
+    };
+
+    reset(sampleData);
+    saveCareerToLocalStorage(sampleData);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -176,7 +252,10 @@ export default function CareerPage() {
           </div>
 
           {/* 履歴書へのリンク */}
-          <div className="mt-4">
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <Button variant="secondary" onClick={handleFillSample}>
+              サンプル入力
+            </Button>
             <Link href="/">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
