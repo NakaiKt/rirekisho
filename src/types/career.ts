@@ -26,9 +26,6 @@ export interface CareerFormData {
 
   // 保有スキル
   skills?: SkillEntry[];
-
-  // 自己PR
-  selfPR?: string;
 }
 
 export interface CareerHistoryEntry {

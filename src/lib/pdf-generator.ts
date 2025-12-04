@@ -9,9 +9,10 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
     const margin = 10; // 10mm margins on all sides
     const usableWidth = pageWidth - margin * 2;
     const usableHeight = pageHeight - margin * 2;
+    const sectionSpacing = 8; // PDFのみでセクション間に余白を追加
 
     // Find all sections marked with data-pdf-section
-    const sections = element.querySelectorAll("[data-pdf-section]");
+    const sections = Array.from(element.querySelectorAll("[data-pdf-section]"));
 
     if (sections.length === 0) {
       // Fallback to original behavior if no sections found
@@ -44,8 +45,8 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
       let currentY = margin;
       let isFirstPage = true;
 
-      for (const section of Array.from(sections)) {
-        const sectionElement = section as HTMLElement;
+      for (let index = 0; index < sections.length; index++) {
+        const sectionElement = sections[index] as HTMLElement;
 
         const canvas = await html2canvas(sectionElement, {
           scale: 2,
@@ -109,6 +110,17 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
         }
 
         isFirstPage = false;
+        // セクション間の余白をPDFにのみ追加
+        const isLastSection = index === sections.length - 1;
+        if (!isLastSection) {
+          // 余白がページに収まらない場合は改ページ
+          if (currentY + sectionSpacing > pageHeight - margin) {
+            pdf.addPage();
+            currentY = margin;
+          } else {
+            currentY += sectionSpacing;
+          }
+        }
       }
     }
 

@@ -65,7 +65,6 @@ export default function CareerPage() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const formValues = watch();
-  const selfPRValue = watch("selfPR") || "";
   const summaryValue = watch("summary") || "";
   const postalCodeValue = watch("postalCode") || "";
   const birthDateValue = watch("birthDate") || "";
@@ -214,8 +213,6 @@ export default function CareerPage() {
           experience: "3年",
         },
       ],
-      selfPR:
-        "エンジニアやデザイナーと連携し、プロダクトの価値を高めるコミュニケーションに強みがあります。",
     };
 
     reset(sampleData);
@@ -731,35 +728,6 @@ export default function CareerPage() {
                 <Plus className="w-4 h-4 mr-2" />
                 スキルを追加
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* 自己PR */}
-          <Card>
-            <CardHeader>
-              <CardTitle>自己PR（任意）</CardTitle>
-              <CardDescription>
-                あなたの強みや特技、これまでの経験をアピールしましょう。
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
-                <p className="font-medium mb-2">自己PRの書き方のポイント</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>具体的なエピソードを交えて書く</li>
-                  <li>数字や実績を盛り込むと説得力が増す</li>
-                  <li>応募先企業で活かせる強みを強調する</li>
-                  <li>200〜400字程度が目安</li>
-                </ul>
-              </div>
-              <div className="flex justify-end text-sm text-muted-foreground">
-                文字数: {selfPRValue.length}
-              </div>
-              <Textarea
-                {...register("selfPR")}
-                placeholder="例：私の強みは、コミュニケーション能力と問題解決力です。前職では..."
-                rows={5}
-              />
             </CardContent>
           </Card>
 
