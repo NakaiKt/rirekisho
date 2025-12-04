@@ -259,8 +259,6 @@ export const careerSchema = z.object({
       })
     )
     .optional(),
-
-  selfPR: z.string().optional(),
 });
 
 export type CareerFormData = z.infer<typeof careerSchema>;
