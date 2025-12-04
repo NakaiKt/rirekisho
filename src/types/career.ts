@@ -50,6 +50,5 @@ export interface SkillEntry {
   id: string;
   category?: string; // カテゴリ（例：プログラミング言語、フレームワーク、ツール等）
   skillName: string;
-  level?: "beginner" | "intermediate" | "advanced" | "expert"; // 初級、中級、上級、エキスパート
   experience?: string; // 経験年数や詳細
 }

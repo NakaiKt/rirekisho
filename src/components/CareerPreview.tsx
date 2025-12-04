@@ -15,13 +15,6 @@ const employmentTypeLabels: Record<string, string> = {
   dispatch: "派遣",
 };
 
-const skillLevelLabels: Record<string, string> = {
-  beginner: "初級",
-  intermediate: "中級",
-  advanced: "上級",
-  expert: "エキスパート",
-};
-
 export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
   ({ data }, ref) => {
     const parseBirthDate = () => {
@@ -269,7 +262,6 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
                 <tr className="bg-gray-50">
                   <th className="border border-black p-2 text-xs w-32">カテゴリ</th>
                   <th className="border border-black p-2 text-xs">スキル名</th>
-                  <th className="border border-black p-2 text-xs w-24">レベル</th>
                   <th className="border border-black p-2 text-xs w-32">経験</th>
                 </tr>
               </thead>
@@ -280,9 +272,6 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
                       {skill.category || "-"}
                     </td>
                     <td className="border border-black p-2 text-sm">{skill.skillName}</td>
-                    <td className="border border-black p-2 text-sm text-center">
-                      {skill.level ? skillLevelLabels[skill.level] || skill.level : "-"}
-                    </td>
                     <td className="border border-black p-2 text-sm">
                       {skill.experience || "-"}
                     </td>

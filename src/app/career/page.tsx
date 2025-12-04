@@ -24,13 +24,6 @@ const employmentTypeLabels = {
   dispatch: "派遣",
 };
 
-const skillLevelLabels = {
-  beginner: "初級",
-  intermediate: "中級",
-  advanced: "上級",
-  expert: "エキスパート",
-};
-
 export default function CareerPage() {
   const {
     register,
@@ -206,21 +199,18 @@ export default function CareerPage() {
           id: crypto.randomUUID(),
           category: "言語/フレームワーク",
           skillName: "TypeScript",
-          level: "advanced",
           experience: "5年",
         },
         {
           id: crypto.randomUUID(),
           category: "プロジェクト管理",
           skillName: "Scrum / アジャイル開発",
-          level: "advanced",
           experience: "4年",
         },
         {
           id: crypto.randomUUID(),
           category: "デザイン/ドキュメント",
           skillName: "Figma / Notion",
-          level: "intermediate",
           experience: "3年",
         },
       ],
@@ -717,29 +707,12 @@ export default function CareerPage() {
                     </div>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>レベル</Label>
-                      <select
-                        {...register(`skills.${index}.level` as const)}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      >
-                        <option value="">選択してください</option>
-                        {Object.entries(skillLevelLabels).map(([value, label]) => (
-                          <option key={value} value={value}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>経験年数・詳細</Label>
-                      <Input
-                        {...register(`skills.${index}.experience` as const)}
-                        placeholder="例：3年、実務経験あり"
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label>経験年数・詳細</Label>
+                    <Input
+                      {...register(`skills.${index}.experience` as const)}
+                      placeholder="例：3年、実務経験あり"
+                    />
                   </div>
                 </div>
               ))}

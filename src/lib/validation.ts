@@ -255,7 +255,6 @@ export const careerSchema = z.object({
         id: z.string(),
         category: z.string().optional(),
         skillName: z.string().min(1, "スキル名を入力してください"),
-        level: z.enum(["beginner", "intermediate", "advanced", "expert"]).optional(),
         experience: z.string().optional(),
       })
     )
