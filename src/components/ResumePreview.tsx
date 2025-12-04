@@ -106,7 +106,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
         style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
       >
         {/* タイトルと日付、基本情報をまとめたセクション */}
-        <div data-pdf-section="header">
+        <div data-pdf-section="header" className="mb-8">
           {/* タイトル */}
           <h1 className="text-3xl font-bold text-center mb-6 tracking-widest">履 歴 書</h1>
 
@@ -209,7 +209,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
         </div>
 
         {/* 学歴・職歴 */}
-        <div data-pdf-section="history">
+        <div data-pdf-section="history" className="mt-8">
           <table
             className="w-full border-collapse border-2 border-black mb-4"
           >
@@ -270,7 +270,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
 
         {/* 資格・免許 */}
         {data.qualifications && data.qualifications.length > 0 && (
-          <div data-pdf-section="qualifications">
+          <div data-pdf-section="qualifications" className="mt-8">
             <table
               className="w-full border-collapse border-2 border-black mb-4"
             >
@@ -306,7 +306,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
 
         {/* 志望動機・自己PR */}
         {(data.motivation || data.selfPR) && (
-          <div data-pdf-section="motivation">
+          <div data-pdf-section="motivation" className="mt-8">
             <table
               className="w-full border-collapse border-2 border-black mb-4"
             >
@@ -338,7 +338,7 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
 
         {/* 本人希望欄 */}
         {data.remarks && (
-          <div data-pdf-section="remarks">
+          <div data-pdf-section="remarks" className="mt-8">
             <table
               className="w-full border-collapse border-2 border-black"
             >

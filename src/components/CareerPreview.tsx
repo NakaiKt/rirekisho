@@ -54,7 +54,7 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
         style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
       >
         {/* ヘッダー */}
-        <div data-pdf-section="header">
+        <div data-pdf-section="header" className="mb-8">
           {/* タイトル */}
           <h1 className="text-3xl font-bold text-center mb-6 tracking-widest">職務経歴書</h1>
 
@@ -143,7 +143,7 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
 
         {/* 職務要約 */}
         {data.summary && (
-          <div data-pdf-section="summary" className="mb-6">
+          <div data-pdf-section="summary" className="mt-8 mb-6">
             <div className="bg-gray-100 border-2 border-black p-2 mb-2">
               <h2 className="text-lg font-bold">職務要約</h2>
             </div>
@@ -155,7 +155,7 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
 
         {/* 職務経歴 */}
         {data.careerHistory && data.careerHistory.length > 0 && (
-          <div data-pdf-section="career-history" className="mb-6">
+          <div data-pdf-section="career-history" className="mt-8 mb-6">
             <div className="bg-gray-100 border-2 border-black p-2 mb-2">
               <h2 className="text-lg font-bold">職務経歴</h2>
             </div>
@@ -253,7 +253,7 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
 
         {/* 保有スキル */}
         {data.skills && data.skills.length > 0 && (
-          <div data-pdf-section="skills" className="mb-6">
+          <div data-pdf-section="skills" className="mt-8 mb-6">
             <div className="bg-gray-100 border-2 border-black p-2 mb-2">
               <h2 className="text-lg font-bold">保有スキル</h2>
             </div>
@@ -282,17 +282,6 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
           </div>
         )}
 
-        {/* 自己PR */}
-        {data.selfPR && (
-          <div data-pdf-section="self-pr" className="mb-6">
-            <div className="bg-gray-100 border-2 border-black p-2 mb-2">
-              <h2 className="text-lg font-bold">自己PR</h2>
-            </div>
-            <div className="border-2 border-t-0 border-black p-3 text-sm whitespace-pre-wrap">
-              {data.selfPR}
-            </div>
-          </div>
-        )}
       </div>
     );
   }
