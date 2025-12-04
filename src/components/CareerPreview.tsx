@@ -144,7 +144,7 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
         {/* 職務要約 */}
         {data.summary && (
           <div data-pdf-section="summary" className="mt-8 mb-6">
-            <div className="bg-gray-100 border-2 border-black p-2 mb-2">
+            <div className="bg-gray-100 border-2 border-black p-2">
               <h2 className="text-lg font-bold">職務要約</h2>
             </div>
             <div className="border-2 border-t-0 border-black p-3 text-sm whitespace-pre-wrap">
@@ -156,7 +156,7 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
         {/* 職務経歴 */}
         {data.careerHistory && data.careerHistory.length > 0 && (
           <div data-pdf-section="career-history" className="mt-8 mb-6">
-            <div className="bg-gray-100 border-2 border-black p-2 mb-2">
+            <div className="bg-gray-100 border-2 border-black p-2">
               <h2 className="text-lg font-bold">職務経歴</h2>
             </div>
             <div className="border-2 border-t-0 border-black">
