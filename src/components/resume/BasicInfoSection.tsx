@@ -83,7 +83,7 @@ export function BasicInfoSection({
             性別 <span className="text-red-500">*</span>
           </Label>
           <RadioGroup
-            defaultValue={genderValue}
+            value={genderValue}
             aria-invalid={!!errors.gender}
             onValueChange={(value) => setValue("gender", value as "male" | "female")}
           >

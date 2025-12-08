@@ -57,6 +57,8 @@ export const ResumePreview = forwardRef<HTMLDivElement, ResumePreviewProps>(
 
       if (edu.status === "enrolled") {
         rows.push({ id: `${edu.id}-status`, year: "", month: "", text: `${edu.schoolName} 在学中` });
+      } else if (edu.status === "on_leave") {
+        rows.push({ id: `${edu.id}-status`, year: "", month: "", text: `${edu.schoolName} 休学中` });
       } else {
         const completionEra =
           edu.completionYear && edu.completionMonth

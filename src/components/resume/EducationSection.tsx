@@ -79,7 +79,7 @@ export function EducationSection({
                     <Input
                       type="number"
                       placeholder="2024"
-                      disabled={status === "enrolled"}
+                      disabled={status === "enrolled" || status === "on_leave"}
                       {...register(`education.${index}.completionYear` as const, {
                         setValueAs: (value) => (value === "" ? undefined : Number(value)),
                       })}
@@ -89,7 +89,7 @@ export function EducationSection({
                       placeholder="3"
                       min="1"
                       max="12"
-                      disabled={status === "enrolled"}
+                      disabled={status === "enrolled" || status === "on_leave"}
                       {...register(`education.${index}.completionMonth` as const, {
                         setValueAs: (value) => (value === "" ? undefined : Number(value)),
                       })}
@@ -101,7 +101,7 @@ export function EducationSection({
                         onChange: (event) => {
                           const value = event.target.value as EducationStatus;
                           setValue(`education.${index}.status`, value);
-                          if (value === "enrolled") {
+                          if (value === "enrolled" || value === "on_leave") {
                             setValue(`education.${index}.completionYear`, undefined);
                             setValue(`education.${index}.completionMonth`, undefined);
                           }
@@ -111,6 +111,9 @@ export function EducationSection({
                     >
                       <option value="enrolled">在学中</option>
                       <option value="graduated">卒業</option>
+                      <option value="completed">修了</option>
+                      <option value="withdrawn">中退</option>
+                      <option value="on_leave">休学中</option>
                     </select>
                   </div>
                 </div>
