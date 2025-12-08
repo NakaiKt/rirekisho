@@ -41,7 +41,7 @@ export const resumeSchema = z.object({
         schoolName: z.string().min(1, "学校名を入力してください"),
         entryYear: z.number().optional(),
         entryMonth: z.number().optional(),
-        status: z.enum(["graduated", "withdrawn", "completed", "enrolled"]),
+        status: z.enum(["graduated", "withdrawn", "completed", "enrolled", "on_leave"]),
         completionYear: z.number().optional(),
         completionMonth: z.number().optional(),
       })
@@ -64,7 +64,7 @@ export const resumeSchema = z.object({
           });
         }
 
-        if (entry.status !== "enrolled") {
+        if (entry.status !== "enrolled" && entry.status !== "on_leave") {
           if (typeof entry.completionYear !== "number" || Number.isNaN(entry.completionYear)) {
             ctx.addIssue({
               code: "custom",

@@ -39,7 +39,7 @@ export interface EducationEntry {
   schoolName: string;
   entryYear?: number;
   entryMonth?: number;
-  status: "graduated" | "withdrawn" | "completed" | "enrolled";
+  status: "graduated" | "withdrawn" | "completed" | "enrolled" | "on_leave";
   completionYear?: number;
   completionMonth?: number;
 }
