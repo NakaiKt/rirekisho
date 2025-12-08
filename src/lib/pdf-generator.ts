@@ -24,20 +24,20 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
         windowHeight: element.scrollHeight,
       });
 
-      const imageData = canvas.toDataURL("image/png");
+      const imageData = canvas.toDataURL("image/jpeg", 0.92);
       const imageWidth = usableWidth;
       const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
       let position = margin;
       let heightLeft = imageHeight;
 
-      pdf.addImage(imageData, "PNG", margin, position, imageWidth, imageHeight);
+      pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight);
       heightLeft -= usableHeight;
 
       while (heightLeft > 0) {
         position -= usableHeight;
         pdf.addPage();
-        pdf.addImage(imageData, "PNG", margin, position + margin, imageWidth, imageHeight);
+        pdf.addImage(imageData, "JPEG", margin, position + margin, imageWidth, imageHeight);
         heightLeft -= usableHeight;
       }
     } else {
@@ -55,7 +55,7 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
           windowWidth: element.scrollWidth,
         });
 
-        const imageData = canvas.toDataURL("image/png");
+        const imageData = canvas.toDataURL("image/jpeg", 0.92);
         const imageWidth = usableWidth;
         const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
@@ -90,8 +90,8 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
                 canvas.width, sliceHeight * ratio
               );
 
-              const sliceImageData = tempCanvas.toDataURL("image/png");
-              pdf.addImage(sliceImageData, "PNG", margin, currentY, imageWidth, sliceHeight);
+              const sliceImageData = tempCanvas.toDataURL("image/jpeg", 0.92);
+              pdf.addImage(sliceImageData, "JPEG", margin, currentY, imageWidth, sliceHeight);
             }
 
             remainingHeight -= sliceHeight;
@@ -105,7 +105,7 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
             }
           }
         } else {
-          pdf.addImage(imageData, "PNG", margin, currentY, imageWidth, imageHeight);
+          pdf.addImage(imageData, "JPEG", margin, currentY, imageWidth, imageHeight);
           currentY += imageHeight;
         }
 
