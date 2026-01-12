@@ -1,7 +1,10 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { generateResumePDFWithText } from './pdf-lib-generator';
+import { ResumeFormData } from './validation';
 
-export async function generatePDF(element: HTMLElement, filename: string = "document"): Promise<void> {
+// 古いhtml2canvas版のPDF生成（バックアップ）
+export async function generatePDFLegacy(element: HTMLElement, filename: string = "document"): Promise<void> {
   try {
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -135,10 +138,10 @@ export async function generatePDF(element: HTMLElement, filename: string = "docu
 
 // 履歴書用のPDF生成関数（後方互換性のため）
 export async function generateResumePDF(element: HTMLElement): Promise<void> {
-  return generatePDF(element, "rirekisho");
+  return generatePDFLegacy(element, "rirekisho");
 }
 
 // 職務経歴書用のPDF生成関数
 export async function generateCareerPDF(element: HTMLElement): Promise<void> {
-  return generatePDF(element, "shokumu-keirekisho");
+  return generatePDFLegacy(element, "shokumu-keirekisho");
 }

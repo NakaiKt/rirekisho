@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FileText, Shield, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { formatPostalCode, searchPostalCode } from "@/lib/postal-code";
-import { generateCareerPDF } from "@/lib/pdf-generator";
+import { generateCareerPDFWithText } from "@/lib/pdf-lib-generator";
 import { CareerPreview } from "@/components/CareerPreview";
 
 const employmentTypeLabels = {
@@ -123,16 +123,11 @@ export default function CareerPage() {
   };
 
   // PDF生成
-  const onSubmit = async (_data: CareerFormData) => {
-    if (!careerPreviewRef.current) {
-      alert("プレビューの生成に失敗しました。");
-      return;
-    }
-
+  const onSubmit = async (data: CareerFormData) => {
     setIsGenerating(true);
     try {
       setSubmitError(null);
-      await generateCareerPDF(careerPreviewRef.current);
+      await generateCareerPDFWithText(data);
     } catch (error) {
       console.error("PDF生成に失敗しました:", error);
       alert("PDF生成に失敗しました。もう一度お試しください。");
