@@ -20,18 +20,43 @@ async function loadJapaneseFont(): Promise<ArrayBuffer> {
   }
 
   try {
-    // Google Fonts から Noto Sans JP をフェッチ
-    const response = await fetch(
-      'https://fonts.gstatic.com/s/notosansjp/v52/nKKZ-Go6G5tXcoaSEQGodLxA_Rc-msGlWbfPwB-obIL_HGo5xA.ttf'
+    // Google Fonts API から Noto Sans JP の CSS を取得
+    const cssResponse = await fetch(
+      'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap',
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      }
     );
-    if (!response.ok) {
-      throw new Error('Failed to fetch font');
+
+    if (!cssResponse.ok) {
+      throw new Error('Failed to fetch font CSS');
     }
-    cachedFont = await response.arrayBuffer();
+
+    const cssText = await cssResponse.text();
+
+    // CSS から フォント URL を抽出
+    const fontUrlMatch = cssText.match(/url\((https:\/\/[^)]+\.(?:woff2|ttf|otf))\)/);
+
+    if (!fontUrlMatch) {
+      throw new Error('Font URL not found in CSS');
+    }
+
+    const fontUrl = fontUrlMatch[1];
+
+    // フォントファイルをフェッチ
+    const fontResponse = await fetch(fontUrl);
+
+    if (!fontResponse.ok) {
+      throw new Error('Failed to fetch font file');
+    }
+
+    cachedFont = await fontResponse.arrayBuffer();
     return cachedFont;
   } catch (error) {
     console.error('Failed to load Japanese font:', error);
-    throw new Error('日本語フォントの読み込みに失敗しました');
+    throw new Error('日本語フォントの読み込みに失敗しました。もう一度お試しください。');
   }
 }
 
