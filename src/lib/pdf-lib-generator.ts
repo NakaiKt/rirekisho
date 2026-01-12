@@ -21,7 +21,7 @@ async function loadJapaneseFont(): Promise<ArrayBuffer> {
 
   try {
     // ローカルのフォントファイルを読み込み
-    const fontUrl = '/fonts/NotoSansJP-Regular.otf';
+    const fontUrl = '/fonts/NotoSansJP-Regular.ttf';
     console.log('Loading font from:', fontUrl);
 
     const fontResponse = await fetch(fontUrl);
