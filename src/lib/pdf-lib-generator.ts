@@ -86,7 +86,7 @@ export async function generateResumePDFWithText(data: ResumeFormData): Promise<v
     currentY -= dateSize + mmToPoints(4);
 
     // 基本情報テーブル
-    currentY = await drawBasicInfoTable(page, jpFont, data, margin, currentY, usableWidth);
+    currentY = await drawBasicInfoTable(page, pdfDoc, jpFont, data, margin, currentY, usableWidth);
 
     // 学歴・職歴テーブル
     currentY -= mmToPoints(8);
@@ -140,6 +140,7 @@ export async function generateResumePDFWithText(data: ResumeFormData): Promise<v
 // 基本情報テーブルを描画
 async function drawBasicInfoTable(
   page: any,
+  pdfDoc: any,
   font: any,
   data: ResumeFormData,
   margin: number,
