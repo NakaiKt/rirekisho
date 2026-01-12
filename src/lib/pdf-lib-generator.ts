@@ -11,7 +11,7 @@ const MARGIN = 10;
 // mm to points conversion (1mm = 2.83465 points)
 const mmToPoints = (mm: number) => mm * 2.83465;
 
-// 日本語フォントをGoogle Fontsから取得
+// 日本語フォントをローカルファイルから取得
 let cachedFont: ArrayBuffer | null = null;
 
 async function loadJapaneseFont(): Promise<ArrayBuffer> {
@@ -20,36 +20,10 @@ async function loadJapaneseFont(): Promise<ArrayBuffer> {
   }
 
   try {
-    // Google Fonts API から Noto Sans JP の CSS を取得
-    // 古いブラウザのUser-AgentでTTF形式を取得
-    const cssResponse = await fetch(
-      'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap',
-      {
-        headers: {
-          // IE11のUser-AgentでTTF形式を取得
-          'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko'
-        }
-      }
-    );
-
-    if (!cssResponse.ok) {
-      throw new Error('Failed to fetch font CSS');
-    }
-
-    const cssText = await cssResponse.text();
-
-    // CSS から TTF/OTF フォント URL を抽出（woff2は除外）
-    const fontUrlMatch = cssText.match(/url\((https:\/\/[^)]+\.(?:ttf|otf))\)/);
-
-    if (!fontUrlMatch) {
-      console.error('Font CSS:', cssText);
-      throw new Error('TTF/OTF font URL not found in CSS. Check console for details.');
-    }
-
-    const fontUrl = fontUrlMatch[1];
+    // ローカルのフォントファイルを読み込み
+    const fontUrl = '/fonts/NotoSansJP-Regular.otf';
     console.log('Loading font from:', fontUrl);
 
-    // フォントファイルをフェッチ
     const fontResponse = await fetch(fontUrl);
 
     if (!fontResponse.ok) {
