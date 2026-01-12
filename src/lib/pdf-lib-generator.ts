@@ -204,9 +204,57 @@ async function drawBasicInfoTable(
     borderWidth: 0.5,
   });
 
-  // 写真があれば埋め込み（実装は後で）
+  // 写真があれば埋め込み
   if (data.photo) {
-    // TODO: 画像の埋め込み処理
+    try {
+      // Base64データから画像形式を判定
+      const base64Data = data.photo.split(',')[1] || data.photo;
+      const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+
+      let image;
+      if (data.photo.includes('image/png') || data.photo.startsWith('iVBORw0KGgo')) {
+        image = await pdfDoc.embedPng(imageBytes);
+      } else {
+        // JPEG or default
+        image = await pdfDoc.embedJpg(imageBytes);
+      }
+
+      // 写真を枠内に収まるように縮小して描画
+      const imgAspectRatio = image.width / image.height;
+      const frameAspectRatio = photoWidth / photoHeight;
+
+      let drawWidth = photoWidth;
+      let drawHeight = photoHeight;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (imgAspectRatio > frameAspectRatio) {
+        // 画像が横長の場合、幅を基準に
+        drawHeight = photoWidth / imgAspectRatio;
+        offsetY = (photoHeight - drawHeight) / 2;
+      } else {
+        // 画像が縦長の場合、高さを基準に
+        drawWidth = photoHeight * imgAspectRatio;
+        offsetX = (photoWidth - drawWidth) / 2;
+      }
+
+      page.drawImage(image, {
+        x: margin + labelWidth + contentWidth + offsetX,
+        y: currentY - photoHeight + offsetY,
+        width: drawWidth,
+        height: drawHeight,
+      });
+    } catch (error) {
+      console.error('Failed to embed photo:', error);
+      // エラー時は「写真」テキストを表示
+      page.drawText('写真', {
+        x: margin + labelWidth + contentWidth + photoWidth / 2 - font.widthOfTextAtSize('写真', 8) / 2,
+        y: currentY - photoHeight / 2,
+        size: 8,
+        font: font,
+        color: rgb(0.7, 0.7, 0.7),
+      });
+    }
   } else {
     page.drawText('写真', {
       x: margin + labelWidth + contentWidth + photoWidth / 2 - font.widthOfTextAtSize('写真', 8) / 2,
