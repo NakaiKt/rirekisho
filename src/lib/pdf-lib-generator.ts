@@ -11,6 +11,18 @@ const MARGIN = 10;
 // mm to points conversion (1mm = 2.83465 points)
 const mmToPoints = (mm: number) => mm * 2.83465;
 
+// テキストを垂直方向に中央揃えで描画するためのY座標を計算
+// cellTopY: セルの上端のY座標
+// cellHeight: セルの高さ
+// fontSize: フォントサイズ
+const getCenteredTextY = (cellTopY: number, cellHeight: number, fontSize: number): number => {
+  const cellCenterY = cellTopY - cellHeight / 2;
+  // フォントのベースラインを考慮して、視覚的に中央に配置
+  // 日本語フォントの場合、ベースラインから上に約70%、下に約30%描画されるため、
+  // フォントサイズの35%分下にずらすことで視覚的に中央に配置される
+  return cellCenterY - fontSize * 0.35;
+};
+
 // 日本語フォントをローカルファイルから取得
 let cachedFont: ArrayBuffer | null = null;
 
@@ -250,7 +262,7 @@ async function drawBasicInfoTable(
       // エラー時は「写真」テキストを表示
       page.drawText('写真', {
         x: margin + labelWidth + contentWidth + photoWidth / 2 - font.widthOfTextAtSize('写真', 8) / 2,
-        y: currentY - photoHeight / 2,
+        y: getCenteredTextY(currentY, photoHeight, 8),
         size: 8,
         font: font,
         color: rgb(0.7, 0.7, 0.7),
@@ -259,7 +271,7 @@ async function drawBasicInfoTable(
   } else {
     page.drawText('写真', {
       x: margin + labelWidth + contentWidth + photoWidth / 2 - font.widthOfTextAtSize('写真', 8) / 2,
-      y: currentY - photoHeight / 2,
+      y: getCenteredTextY(currentY, photoHeight, 8),
       size: 8,
       font: font,
       color: rgb(0.7, 0.7, 0.7),
@@ -301,7 +313,7 @@ async function drawBasicInfoTable(
   });
   page.drawText('現住所', {
     x: margin + cellPadding,
-    y: currentY - addressRowHeight / 2,
+    y: getCenteredTextY(currentY, addressRowHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -320,7 +332,7 @@ async function drawBasicInfoTable(
   });
   page.drawText(`〒${data.postalCode || ''}`, {
     x: margin + labelWidth + cellPadding,
-    y: currentY - postalHeight + cellPadding,
+    y: getCenteredTextY(currentY, postalHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -330,17 +342,18 @@ async function drawBasicInfoTable(
   const addressText = [data.prefecture, data.city, data.address, data.building]
     .filter(Boolean)
     .join(' ');
+  const addressHeight = addressRowHeight - postalHeight;
   page.drawRectangle({
     x: margin + labelWidth,
     y: currentY - addressRowHeight,
     width: contentWidth + photoWidth,
-    height: addressRowHeight - postalHeight,
+    height: addressHeight,
     borderColor: rgb(0, 0, 0),
     borderWidth: 0.5,
   });
   page.drawText(addressText, {
     x: margin + labelWidth + cellPadding,
-    y: currentY - addressRowHeight + cellPadding,
+    y: getCenteredTextY(currentY - postalHeight, addressHeight, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -363,7 +376,7 @@ async function drawBasicInfoTable(
   });
   page.drawText('電話番号', {
     x: margin + cellPadding,
-    y: currentY - contactHeight / 2,
+    y: getCenteredTextY(currentY, contactHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -380,7 +393,7 @@ async function drawBasicInfoTable(
   });
   page.drawText(data.phone || '', {
     x: margin + labelWidth + cellPadding,
-    y: currentY - contactHeight / 2,
+    y: getCenteredTextY(currentY, contactHeight, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -398,7 +411,7 @@ async function drawBasicInfoTable(
   });
   page.drawText('メール', {
     x: margin + labelWidth + halfWidth + cellPadding,
-    y: currentY - contactHeight / 2,
+    y: getCenteredTextY(currentY, contactHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -416,7 +429,7 @@ async function drawBasicInfoTable(
   const emailSize = 8;
   page.drawText(data.email || '', {
     x: margin + labelWidth + halfWidth + labelWidth + cellPadding,
-    y: currentY - contactHeight / 2,
+    y: getCenteredTextY(currentY, contactHeight, emailSize),
     size: emailSize,
     font: font,
     color: rgb(0, 0, 0),
@@ -455,7 +468,7 @@ function drawTableCell(
   });
   page.drawText(label, {
     x: x + padding,
-    y: y - height / 2,
+    y: getCenteredTextY(y, height, labelSize),
     size: labelSize,
     font: font,
     color: rgb(0, 0, 0),
@@ -472,7 +485,7 @@ function drawTableCell(
   });
   page.drawText(value, {
     x: x + labelWidth + padding,
-    y: y - height / 2,
+    y: getCenteredTextY(y, height, valueSize),
     size: valueSize,
     font: font,
     color: rgb(0, 0, 0),
@@ -597,7 +610,7 @@ async function drawHistoryTable(
     const sectionWidth = font.widthOfTextAtSize(sectionText, 10);
     page.drawText(sectionText, {
       x: margin + usableWidth / 2 - sectionWidth / 2,
-      y: currentY - rowHeight / 2,
+      y: getCenteredTextY(currentY, rowHeight, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -639,7 +652,7 @@ async function drawHistoryTable(
     const sectionWidth = font.widthOfTextAtSize(sectionText, 10);
     page.drawText(sectionText, {
       x: margin + usableWidth / 2 - sectionWidth / 2,
-      y: currentY - rowHeight / 2,
+      y: getCenteredTextY(currentY, rowHeight, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -688,7 +701,7 @@ async function drawHistoryTable(
     const endTextWidth = font.widthOfTextAtSize(endText, 10);
     page.drawText(endText, {
       x: margin + usableWidth - endTextWidth - cellPadding,
-      y: currentY - rowHeight / 2,
+      y: getCenteredTextY(currentY, rowHeight, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -724,7 +737,7 @@ function drawHistoryHeaderRow(
   const yearTextWidth = font.widthOfTextAtSize(yearText, 10);
   page.drawText(yearText, {
     x: x + yearWidth / 2 - yearTextWidth / 2,
-    y: y - height / 2,
+    y: getCenteredTextY(y, height, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -744,7 +757,7 @@ function drawHistoryHeaderRow(
   const monthTextWidth = font.widthOfTextAtSize(monthText, 10);
   page.drawText(monthText, {
     x: x + yearWidth + monthWidth / 2 - monthTextWidth / 2,
-    y: y - height / 2,
+    y: getCenteredTextY(y, height, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -762,7 +775,7 @@ function drawHistoryHeaderRow(
   });
   page.drawText('学歴・職歴', {
     x: x + yearWidth + monthWidth + padding,
-    y: y - height / 2,
+    y: getCenteredTextY(y, height, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -796,7 +809,7 @@ function drawHistoryRow(
     const yearTextWidth = font.widthOfTextAtSize(year, 10);
     page.drawText(year, {
       x: x + yearWidth / 2 - yearTextWidth / 2,
-      y: y - height / 2,
+      y: getCenteredTextY(y, height, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -816,7 +829,7 @@ function drawHistoryRow(
     const monthTextWidth = font.widthOfTextAtSize(month, 10);
     page.drawText(month, {
       x: x + yearWidth + monthWidth / 2 - monthTextWidth / 2,
-      y: y - height / 2,
+      y: getCenteredTextY(y, height, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -834,7 +847,7 @@ function drawHistoryRow(
   });
   page.drawText(text, {
     x: x + yearWidth + monthWidth + padding,
-    y: y - height / 2,
+    y: getCenteredTextY(y, height, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -888,7 +901,7 @@ async function drawQualificationsTable(
   const yearTextWidth = font.widthOfTextAtSize(yearText, 10);
   page.drawText(yearText, {
     x: margin + yearWidth / 2 - yearTextWidth / 2,
-    y: currentY - rowHeight / 2,
+    y: getCenteredTextY(currentY, rowHeight, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -907,7 +920,7 @@ async function drawQualificationsTable(
   const monthTextWidth = font.widthOfTextAtSize(monthText, 10);
   page.drawText(monthText, {
     x: margin + yearWidth + monthWidth / 2 - monthTextWidth / 2,
-    y: currentY - rowHeight / 2,
+    y: getCenteredTextY(currentY, rowHeight, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -924,7 +937,7 @@ async function drawQualificationsTable(
   });
   page.drawText('資格・免許', {
     x: margin + yearWidth + monthWidth + cellPadding,
-    y: currentY - rowHeight / 2,
+    y: getCenteredTextY(currentY, rowHeight, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -998,7 +1011,7 @@ async function drawMotivationTable(
     });
     page.drawText('志望動機', {
       x: margin + cellPadding,
-      y: currentY - cellPadding - 10,
+      y: getCenteredTextY(currentY, motivationHeight, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -1054,7 +1067,7 @@ async function drawMotivationTable(
     });
     page.drawText('自己PR', {
       x: margin + cellPadding,
-      y: currentY - cellPadding - 10,
+      y: getCenteredTextY(currentY, prHeight, 10),
       size: 10,
       font: font,
       color: rgb(0, 0, 0),
@@ -1130,7 +1143,7 @@ async function drawRemarksTable(
   });
   page.drawText('本人希望欄', {
     x: margin + cellPadding,
-    y: currentY - cellPadding - 10,
+    y: getCenteredTextY(currentY, remarksHeight, 10),
     size: 10,
     font: font,
     color: rgb(0, 0, 0),
@@ -1384,7 +1397,7 @@ async function drawCareerSummary(
   });
   page.drawText('職務要約', {
     x: margin + cellPadding,
-    y: currentY - headerHeight / 2 - 3,
+    y: getCenteredTextY(currentY, headerHeight, 12),
     size: 12,
     font: font,
     color: rgb(0, 0, 0),
@@ -1450,7 +1463,7 @@ async function drawCareerHistory(
   });
   page.drawText('職務経歴', {
     x: margin + cellPadding,
-    y: currentY - headerHeight / 2 - 3,
+    y: getCenteredTextY(currentY, headerHeight, 12),
     size: 12,
     font: font,
     color: rgb(0, 0, 0),
@@ -1613,7 +1626,7 @@ async function drawCareerSkills(
   });
   page.drawText('保有スキル', {
     x: margin + cellPadding,
-    y: currentY - headerHeight / 2 - 3,
+    y: getCenteredTextY(currentY, headerHeight, 12),
     size: 12,
     font: font,
     color: rgb(0, 0, 0),
@@ -1632,7 +1645,7 @@ async function drawCareerSkills(
   });
   page.drawText('カテゴリ', {
     x: margin + cellPadding,
-    y: currentY - rowHeight / 2,
+    y: getCenteredTextY(currentY, rowHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -1649,7 +1662,7 @@ async function drawCareerSkills(
   });
   page.drawText('スキル名', {
     x: margin + categoryWidth + cellPadding,
-    y: currentY - rowHeight / 2,
+    y: getCenteredTextY(currentY, rowHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -1666,7 +1679,7 @@ async function drawCareerSkills(
   });
   page.drawText('経験', {
     x: margin + categoryWidth + skillWidth + cellPadding,
-    y: currentY - rowHeight / 2,
+    y: getCenteredTextY(currentY, rowHeight, 8),
     size: 8,
     font: font,
     color: rgb(0, 0, 0),
@@ -1685,7 +1698,7 @@ async function drawCareerSkills(
     });
     page.drawText(skill.category || '-', {
       x: margin + cellPadding,
-      y: currentY - rowHeight / 2,
+      y: getCenteredTextY(currentY, rowHeight, 9),
       size: 9,
       font: font,
       color: rgb(0, 0, 0),
@@ -1701,7 +1714,7 @@ async function drawCareerSkills(
     });
     page.drawText(skill.skillName || '', {
       x: margin + categoryWidth + cellPadding,
-      y: currentY - rowHeight / 2,
+      y: getCenteredTextY(currentY, rowHeight, 9),
       size: 9,
       font: font,
       color: rgb(0, 0, 0),
@@ -1717,7 +1730,7 @@ async function drawCareerSkills(
     });
     page.drawText(skill.experience || '-', {
       x: margin + categoryWidth + skillWidth + cellPadding,
-      y: currentY - rowHeight / 2,
+      y: getCenteredTextY(currentY, rowHeight, 9),
       size: 9,
       font: font,
       color: rgb(0, 0, 0),
