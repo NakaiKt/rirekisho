@@ -1,25 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import { CareerFormData } from '@/lib/validation';
-
-// Chromiumのパスを探す
-function getChromePath(): string {
-  const possiblePaths = [
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-  ];
-
-  if (process.env.CHROME_PATH) {
-    return process.env.CHROME_PATH;
-  }
-
-  return possiblePaths[0];
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +9,6 @@ export async function POST(request: NextRequest) {
     const html = generateCareerHTML(data);
 
     const browser = await puppeteer.launch({
-      executablePath: getChromePath(),
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
