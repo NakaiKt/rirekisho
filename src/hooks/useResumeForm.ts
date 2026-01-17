@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ResumeFormData, resumeSchema } from "@/lib/validation";
 import { calculateSchoolSchedule } from "@/lib/era-converter";
 import { searchPostalCode } from "@/lib/postal-code";
-import { generateResumePDFWithText } from "@/lib/pdf-lib-generator";
+import { generateResumePDFWithPuppeteer } from "@/lib/puppeteer-pdf-generator";
 import { loadFromLocalStorage, saveToLocalStorage } from "@/lib/local-storage";
 
 const parseBirthDate = (value?: string) => {
@@ -133,7 +133,7 @@ export function useResumeForm() {
     setIsGenerating(true);
     try {
       setSubmitError(null);
-      await generateResumePDFWithText(data);
+      await generateResumePDFWithPuppeteer(data);
     } catch (error) {
       console.error("PDF生成に失敗しました:", error);
       alert("PDF生成に失敗しました。もう一度お試しください。");

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Noto_Sans_JP } from "next/font/google";
+// import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
-const notoSansJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
+// const notoSansJP = Noto_Sans_JP({
+//   subsets: ["latin"],
+//   weight: ["400", "500", "700"],
+//   display: "swap",
+// });
 
 export const metadata: Metadata = {
   title: "かんたん履歴書作成",
@@ -77,7 +77,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className={notoSansJP.className}>{children}</body>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
