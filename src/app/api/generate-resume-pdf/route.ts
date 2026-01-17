@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 import { ResumeFormData } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
@@ -9,10 +10,12 @@ export async function POST(request: NextRequest) {
     // HTMLテンプレートを生成
     const html = generateResumeHTML(data);
 
-    // Puppeteerでブラウザを起動
+    // Puppeteerでブラウザを起動（Vercel/Lambda対応）
     const browser = await puppeteer.launch({
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+      defaultViewport: { width: 1920, height: 1080 },
+      executablePath: await chromium.executablePath(),
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const page = await browser.newPage();
