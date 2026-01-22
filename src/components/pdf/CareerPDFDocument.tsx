@@ -379,7 +379,7 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
         {/* 職務経歴 */}
         {data.careerHistory && data.careerHistory.length > 0 && (
           <>
-            <View style={styles.sectionHeader} wrap={false}>
+            <View style={styles.sectionHeader} minPresenceAhead={100}>
               <Text style={styles.sectionHeaderText}>職務経歴</Text>
             </View>
             <View style={styles.sectionContent}>

@@ -296,56 +296,63 @@ export const ResumePDFDocument: React.FC<ResumePDFDocumentProps> = ({ data }) =>
 
         {/* 基本情報テーブル */}
         <View style={styles.table} wrap={false}>
-          {/* ふりがな行 */}
-          <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text>ふりがな</Text>
+          {/* 上部：左側に基本情報、右側に写真 */}
+          <View style={{ flexDirection: 'row' }}>
+            {/* 左側：ふりがな〜性別 */}
+            <View style={{ flex: 1 }}>
+              {/* ふりがな行 */}
+              <View style={styles.tableRow}>
+                <View style={styles.labelCell}>
+                  <Text>ふりがな</Text>
+                </View>
+                <View style={styles.valueCellLast}>
+                  <Text>{data.furigana}</Text>
+                </View>
+              </View>
+
+              {/* 氏名行 */}
+              <View style={styles.tableRow}>
+                <View style={styles.labelCell}>
+                  <Text>氏名</Text>
+                </View>
+                <View style={{ ...styles.valueCellLast, fontSize: 16 }}>
+                  <Text>{data.name}</Text>
+                </View>
+              </View>
+
+              {/* 生年月日行 */}
+              <View style={styles.tableRow}>
+                <View style={styles.labelCell}>
+                  <Text>生年月日</Text>
+                </View>
+                <View style={styles.valueCellLast}>
+                  <Text>
+                    {parsedBirthDate && birthEra
+                      ? `${birthEra.displayName}${parsedBirthDate.month}月${parsedBirthDate.day}日生（満${calculateAge()}歳）`
+                      : ''}
+                  </Text>
+                </View>
+              </View>
+
+              {/* 性別行 */}
+              <View style={styles.tableRowLast}>
+                <View style={styles.labelCell}>
+                  <Text>性別</Text>
+                </View>
+                <View style={styles.valueCellLast}>
+                  <Text>{data.gender === 'male' ? '男' : data.gender === 'female' ? '女' : ''}</Text>
+                </View>
+              </View>
             </View>
-            <View style={{ ...styles.valueCell, flex: 3 }}>
-              <Text>{data.furigana}</Text>
-            </View>
-            {/* 写真セル（4行分） */}
-            <View style={{ ...styles.photoCell, height: 120 }}>
+
+            {/* 右側：写真 */}
+            <View style={styles.photoCell}>
               {data.photo ? (
                 // eslint-disable-next-line jsx-a11y/alt-text
                 <Image src={data.photo} style={styles.photoImage} />
               ) : (
                 <Text style={styles.photoPlaceholder}>写真</Text>
               )}
-            </View>
-          </View>
-
-          {/* 氏名行 */}
-          <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text>氏名</Text>
-            </View>
-            <View style={{ ...styles.nameCell, flex: 3 }}>
-              <Text>{data.name}</Text>
-            </View>
-          </View>
-
-          {/* 生年月日行 */}
-          <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text>生年月日</Text>
-            </View>
-            <View style={{ ...styles.valueCell, flex: 3 }}>
-              <Text>
-                {parsedBirthDate && birthEra
-                  ? `${birthEra.displayName}${parsedBirthDate.month}月${parsedBirthDate.day}日生（満${calculateAge()}歳）`
-                  : ''}
-              </Text>
-            </View>
-          </View>
-
-          {/* 性別行 */}
-          <View style={styles.tableRow}>
-            <View style={styles.labelCell}>
-              <Text>性別</Text>
-            </View>
-            <View style={{ ...styles.valueCellLast, flex: 3 }}>
-              <Text>{data.gender === 'male' ? '男' : data.gender === 'female' ? '女' : ''}</Text>
             </View>
           </View>
 
