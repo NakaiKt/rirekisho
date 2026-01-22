@@ -276,7 +276,7 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
         </Text>
 
         {/* 基本情報テーブル */}
-        <View style={styles.table}>
+        <View style={styles.table} wrap={false}>
           {/* ふりがな行 */}
           <View style={styles.tableRow}>
             <View style={styles.labelCell}>
@@ -366,26 +366,27 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
 
         {/* 職務要約 */}
         {data.summary && (
-          <>
+          <View wrap={false}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>職務要約</Text>
             </View>
             <View style={styles.sectionContent}>
               <Text style={{ lineHeight: 1.5 }}>{data.summary}</Text>
             </View>
-          </>
+          </View>
         )}
 
         {/* 職務経歴 */}
         {data.careerHistory && data.careerHistory.length > 0 && (
           <>
-            <View style={styles.sectionHeader}>
+            <View style={styles.sectionHeader} wrap={false}>
               <Text style={styles.sectionHeaderText}>職務経歴</Text>
             </View>
             <View style={styles.sectionContent}>
               {data.careerHistory.map((career, index) => (
                 <View
                   key={career.id}
+                  wrap={false}
                   style={
                     index === data.careerHistory!.length - 1
                       ? styles.careerEntryLast
@@ -441,7 +442,7 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
 
         {/* 保有スキル */}
         {data.skills && data.skills.length > 0 && (
-          <>
+          <View wrap={false}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>保有スキル</Text>
             </View>
@@ -476,7 +477,7 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
                 </View>
               ))}
             </View>
-          </>
+          </View>
         )}
       </Page>
     </Document>
