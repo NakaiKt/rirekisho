@@ -411,28 +411,9 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
                     </Text>
                   )}
 
-                  {/* 業務内容 */}
+                  {/* 業務内容（ラベルなしで直接表示） */}
                   {career.jobDescription && (
-                    <>
-                      <Text style={styles.subSectionTitle}>【業務内容】</Text>
-                      <Text style={styles.subSectionContent}>{career.jobDescription}</Text>
-                    </>
-                  )}
-
-                  {/* 実績・成果 */}
-                  {career.achievements && (
-                    <>
-                      <Text style={styles.subSectionTitle}>【実績・成果】</Text>
-                      <Text style={styles.subSectionContent}>{career.achievements}</Text>
-                    </>
-                  )}
-
-                  {/* 使用技術・スキル */}
-                  {career.technologies && (
-                    <>
-                      <Text style={styles.subSectionTitle}>【使用技術・スキル】</Text>
-                      <Text style={styles.subSectionContent}>{career.technologies}</Text>
-                    </>
+                    <Text style={styles.subSectionContent}>{career.jobDescription}</Text>
                   )}
                 </View>
               ))}
@@ -441,41 +422,13 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
         )}
 
         {/* 保有スキル */}
-        {data.skills && data.skills.length > 0 && (
+        {data.skills && (
           <View wrap={false}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>保有スキル</Text>
             </View>
-            <View style={styles.skillTable}>
-              {/* ヘッダー */}
-              <View style={styles.skillHeaderRow}>
-                <View style={styles.skillCategoryCell}>
-                  <Text style={{ textAlign: 'center', fontWeight: 'bold' }}>カテゴリ</Text>
-                </View>
-                <View style={styles.skillNameCell}>
-                  <Text style={{ textAlign: 'center', fontWeight: 'bold' }}>スキル名</Text>
-                </View>
-                <View style={styles.skillExpCell}>
-                  <Text style={{ textAlign: 'center', fontWeight: 'bold' }}>経験</Text>
-                </View>
-              </View>
-              {/* データ行 */}
-              {data.skills.map((skill, index) => (
-                <View
-                  key={skill.id}
-                  style={index === data.skills!.length - 1 ? styles.skillRowLast : styles.skillRow}
-                >
-                  <View style={styles.skillCategoryCell}>
-                    <Text>{skill.category || '-'}</Text>
-                  </View>
-                  <View style={styles.skillNameCell}>
-                    <Text>{skill.skillName}</Text>
-                  </View>
-                  <View style={styles.skillExpCell}>
-                    <Text>{skill.experience || '-'}</Text>
-                  </View>
-                </View>
-              ))}
+            <View style={styles.sectionContent}>
+              <Text style={{ lineHeight: 1.5 }}>{data.skills}</Text>
             </View>
           </View>
         )}
