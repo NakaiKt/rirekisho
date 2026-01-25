@@ -24,8 +24,8 @@ export interface CareerFormData {
   // 職務経歴の詳細
   careerHistory?: CareerHistoryEntry[];
 
-  // 保有スキル
-  skills?: SkillEntry[];
+  // 保有スキル（自由記述）
+  skills?: string;
 }
 
 export interface CareerHistoryEntry {
@@ -38,14 +38,5 @@ export interface CareerHistoryEntry {
   employmentType?: "fullTime" | "contract" | "partTime" | "dispatch"; // 正社員、契約社員、アルバイト・パート、派遣
   department?: string; // 部署
   position?: string; // 役職
-  jobDescription?: string; // 業務内容
-  achievements?: string; // 実績・成果
-  technologies?: string; // 使用技術・スキル
-}
-
-export interface SkillEntry {
-  id: string;
-  category?: string; // カテゴリ（例：プログラミング言語、フレームワーク、ツール等）
-  skillName: string;
-  experience?: string; // 経験年数や詳細
+  jobDescription?: string; // 業務内容（実績・成果、使用技術・スキルも含む）
 }

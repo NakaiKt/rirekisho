@@ -1551,20 +1551,12 @@ async function drawCareerHistory(
       textY -= 12;
     }
 
-    // 業務内容（簡易版）
+    // 業務内容
     if (career.jobDescription) {
-      page.drawText('【業務内容】', {
-        x: margin + cellPadding,
-        y: textY,
-        size: 8,
-        font: font,
-        color: rgb(0.4, 0.4, 0.4),
-      });
-      textY -= 10;
       const lines = wrapText(career.jobDescription, font, 9, usableWidth - cellPadding * 4);
-      for (let j = 0; j < Math.min(lines.length, 2); j++) {
+      for (let j = 0; j < Math.min(lines.length, 5); j++) {
         page.drawText(lines[j], {
-          x: margin + cellPadding * 2,
+          x: margin + cellPadding,
           y: textY,
           size: 9,
           font: font,
@@ -1589,17 +1581,18 @@ async function drawCareerSkills(
   startY: number,
   usableWidth: number
 ): Promise<number> {
-  if (!data.skills || data.skills.length === 0) return startY;
+  if (!data.skills) return startY;
 
   const borderWidth = 1.5;
-  const cellPadding = mmToPoints(2);
+  const cellPadding = mmToPoints(3);
   const headerHeight = mmToPoints(10);
-  const rowHeight = mmToPoints(9);
-  const categoryWidth = mmToPoints(32);
-  const experienceWidth = mmToPoints(32);
-  const skillWidth = usableWidth - categoryWidth - experienceWidth;
+  const lineHeight = 12;
 
   let currentY = startY;
+
+  // スキルのテキストを行に分割
+  const skillLines = wrapText(data.skills, font, 9, usableWidth - cellPadding * 2);
+  const contentHeight = Math.max(skillLines.length * lineHeight + cellPadding * 2, mmToPoints(20));
 
   // ヘッダー
   page.drawRectangle({
@@ -1620,111 +1613,30 @@ async function drawCareerSkills(
   });
   currentY -= headerHeight;
 
-  // テーブルヘッダー
+  // コンテンツエリア
   page.drawRectangle({
     x: margin,
-    y: currentY - rowHeight,
-    width: categoryWidth,
-    height: rowHeight,
+    y: currentY - contentHeight,
+    width: usableWidth,
+    height: contentHeight,
     borderColor: rgb(0, 0, 0),
-    borderWidth: 0.5,
-    color: rgb(0.95, 0.95, 0.95),
-  });
-  page.drawText('カテゴリ', {
-    x: margin + cellPadding,
-    y: currentY - rowHeight / 2,
-    size: 8,
-    font: font,
-    color: rgb(0, 0, 0),
+    borderWidth: borderWidth,
   });
 
-  page.drawRectangle({
-    x: margin + categoryWidth,
-    y: currentY - rowHeight,
-    width: skillWidth,
-    height: rowHeight,
-    borderColor: rgb(0, 0, 0),
-    borderWidth: 0.5,
-    color: rgb(0.95, 0.95, 0.95),
-  });
-  page.drawText('スキル名', {
-    x: margin + categoryWidth + cellPadding,
-    y: currentY - rowHeight / 2,
-    size: 8,
-    font: font,
-    color: rgb(0, 0, 0),
-  });
-
-  page.drawRectangle({
-    x: margin + categoryWidth + skillWidth,
-    y: currentY - rowHeight,
-    width: experienceWidth,
-    height: rowHeight,
-    borderColor: rgb(0, 0, 0),
-    borderWidth: 0.5,
-    color: rgb(0.95, 0.95, 0.95),
-  });
-  page.drawText('経験', {
-    x: margin + categoryWidth + skillWidth + cellPadding,
-    y: currentY - rowHeight / 2,
-    size: 8,
-    font: font,
-    color: rgb(0, 0, 0),
-  });
-  currentY -= rowHeight;
-
-  // スキル行
-  for (const skill of data.skills) {
-    page.drawRectangle({
-      x: margin,
-      y: currentY - rowHeight,
-      width: categoryWidth,
-      height: rowHeight,
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 0.5,
-    });
-    page.drawText(skill.category || '-', {
+  // スキルテキストを描画
+  let textY = currentY - cellPadding - 10;
+  for (const line of skillLines) {
+    page.drawText(line, {
       x: margin + cellPadding,
-      y: currentY - rowHeight / 2,
+      y: textY,
       size: 9,
       font: font,
       color: rgb(0, 0, 0),
     });
-
-    page.drawRectangle({
-      x: margin + categoryWidth,
-      y: currentY - rowHeight,
-      width: skillWidth,
-      height: rowHeight,
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 0.5,
-    });
-    page.drawText(skill.skillName || '', {
-      x: margin + categoryWidth + cellPadding,
-      y: currentY - rowHeight / 2,
-      size: 9,
-      font: font,
-      color: rgb(0, 0, 0),
-    });
-
-    page.drawRectangle({
-      x: margin + categoryWidth + skillWidth,
-      y: currentY - rowHeight,
-      width: experienceWidth,
-      height: rowHeight,
-      borderColor: rgb(0, 0, 0),
-      borderWidth: 0.5,
-    });
-    page.drawText(skill.experience || '-', {
-      x: margin + categoryWidth + skillWidth + cellPadding,
-      y: currentY - rowHeight / 2,
-      size: 9,
-      font: font,
-      color: rgb(0, 0, 0),
-    });
-
-    currentY -= rowHeight;
+    textY -= lineHeight;
   }
+
+  currentY -= contentHeight;
 
   return currentY;
 }

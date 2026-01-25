@@ -215,33 +215,8 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
 
                     {/* 業務内容 */}
                     {career.jobDescription && (
-                      <div className="mb-2">
-                        <div className="text-xs font-semibold text-gray-700 mb-1">【業務内容】</div>
-                        <div className="text-sm whitespace-pre-wrap pl-2">
-                          {career.jobDescription}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 実績・成果 */}
-                    {career.achievements && (
-                      <div className="mb-2">
-                        <div className="text-xs font-semibold text-gray-700 mb-1">【実績・成果】</div>
-                        <div className="text-sm whitespace-pre-wrap pl-2">
-                          {career.achievements}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 使用技術・スキル */}
-                    {career.technologies && (
-                      <div>
-                        <div className="text-xs font-semibold text-gray-700 mb-1">
-                          【使用技術・スキル】
-                        </div>
-                        <div className="text-sm whitespace-pre-wrap pl-2">
-                          {career.technologies}
-                        </div>
+                      <div className="text-sm whitespace-pre-wrap">
+                        {career.jobDescription}
                       </div>
                     )}
                   </div>
@@ -252,33 +227,14 @@ export const CareerPreview = forwardRef<HTMLDivElement, CareerPreviewProps>(
         )}
 
         {/* 保有スキル */}
-        {data.skills && data.skills.length > 0 && (
+        {data.skills && (
           <div data-pdf-section="skills" className="mt-8 mb-6">
-            <div className="bg-gray-100 border-2 border-black p-2 mb-2">
+            <div className="bg-gray-100 border-2 border-black p-2">
               <h2 className="text-lg font-bold">保有スキル</h2>
             </div>
-            <table className="w-full border-2 border-t-0 border-black border-collapse">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="border border-black p-2 text-xs w-32">カテゴリ</th>
-                  <th className="border border-black p-2 text-xs">スキル名</th>
-                  <th className="border border-black p-2 text-xs w-32">経験</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.skills.map((skill) => (
-                  <tr key={skill.id}>
-                    <td className="border border-black p-2 text-sm">
-                      {skill.category || "-"}
-                    </td>
-                    <td className="border border-black p-2 text-sm">{skill.skillName}</td>
-                    <td className="border border-black p-2 text-sm">
-                      {skill.experience || "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="border-2 border-t-0 border-black p-3 text-sm whitespace-pre-wrap">
+              {data.skills}
+            </div>
           </div>
         )}
 

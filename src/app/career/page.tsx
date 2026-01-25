@@ -38,7 +38,7 @@ export default function CareerPage() {
     defaultValues: {
       birthDate: "",
       careerHistory: [],
-      skills: [],
+      skills: "",
     },
   });
 
@@ -51,14 +51,6 @@ export default function CareerPage() {
     name: "careerHistory",
   });
 
-  const {
-    fields: skillFields,
-    append: appendSkill,
-    remove: removeSkill,
-  } = useFieldArray({
-    control,
-    name: "skills",
-  });
 
   // PDF生成用のref
   const careerPreviewRef = useRef<HTMLDivElement>(null);
@@ -171,9 +163,11 @@ export default function CareerPage() {
           employmentType: "fullTime",
           department: "営業部",
           position: "主任",
-          jobDescription: "法人向けソリューション営業に従事し、新規開拓と既存顧客深耕を担当。",
-          achievements: "年間売上トップ10%を4年間維持。",
-          technologies: "Salesforce / Excel / PowerPoint",
+          jobDescription: `法人向けソリューション営業に従事し、新規開拓と既存顧客深耕を担当。
+
+年間売上トップ10%を4年間維持。
+
+使用ツール：Salesforce / Excel / PowerPoint`,
         },
         {
           id: crypto.randomUUID(),
@@ -183,31 +177,21 @@ export default function CareerPage() {
           employmentType: "fullTime",
           department: "プロダクト開発部",
           position: "プロジェクトマネージャー",
-          jobDescription: "SaaSプロダクトの企画から開発進行、リリース後の改善サイクルまでを統括。",
-          achievements: "月間アクティブユーザーを前年比20%向上。",
-          technologies: "TypeScript / React / AWS / Figma",
+          jobDescription: `SaaSプロダクトの企画から開発進行、リリース後の改善サイクルまでを統括。
+
+月間アクティブユーザーを前年比20%向上。
+
+使用技術：TypeScript / React / AWS / Figma`,
         },
       ],
-      skills: [
-        {
-          id: crypto.randomUUID(),
-          category: "言語/フレームワーク",
-          skillName: "TypeScript",
-          experience: "5年",
-        },
-        {
-          id: crypto.randomUUID(),
-          category: "プロジェクト管理",
-          skillName: "Scrum / アジャイル開発",
-          experience: "4年",
-        },
-        {
-          id: crypto.randomUUID(),
-          category: "デザイン/ドキュメント",
-          skillName: "Figma / Notion",
-          experience: "3年",
-        },
-      ],
+      skills: `【言語/フレームワーク】
+TypeScript（5年）、React（5年）
+
+【プロジェクト管理】
+Scrum / アジャイル開発（4年）
+
+【デザイン/ドキュメント】
+Figma / Notion（3年）`,
     };
 
     reset(sampleData);
@@ -607,26 +591,15 @@ export default function CareerPage() {
                       <Label>業務内容</Label>
                       <Textarea
                         {...register(`careerHistory.${index}.jobDescription` as const)}
-                        placeholder="担当した業務の内容を詳しく記入してください"
-                        rows={4}
-                      />
-                    </div>
+                        placeholder={`【業務内容】
+担当した業務の内容を詳しく記入してください
 
-                    <div className="space-y-2">
-                      <Label>実績・成果</Label>
-                      <Textarea
-                        {...register(`careerHistory.${index}.achievements` as const)}
-                        placeholder="具体的な成果や実績を記入してください"
-                        rows={3}
-                      />
-                    </div>
+【実績・成果】
+具体的な成果や実績を記入してください
 
-                    <div className="space-y-2">
-                      <Label>使用技術・スキル</Label>
-                      <Textarea
-                        {...register(`careerHistory.${index}.technologies` as const)}
-                        placeholder="例：React, TypeScript, Node.js, AWS等"
-                        rows={2}
+【使用技術・スキル】
+React, TypeScript, Node.js, AWS 等`}
+                        rows={10}
                       />
                     </div>
                   </div>
@@ -663,66 +636,18 @@ export default function CareerPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {skillFields.map((field, index) => (
-                <div key={field.id} className="border rounded-lg p-4 space-y-4 relative">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2"
-                    onClick={() => removeSkill(index)}
-                    aria-label="スキルを削除"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+              <Textarea
+                {...register("skills")}
+                placeholder={`【プログラミング言語】
+TypeScript（5年）、Python（3年）、Java（2年）
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>カテゴリ</Label>
-                      <Input
-                        {...register(`skills.${index}.category` as const)}
-                        placeholder="例：プログラミング言語、フレームワーク"
-                      />
-                    </div>
+【フレームワーク】
+React（5年）、Next.js（3年）、Node.js（4年）
 
-                    <div className="space-y-2">
-                      <Label>スキル名</Label>
-                      <Input
-                        {...register(`skills.${index}.skillName` as const)}
-                        placeholder="例：React、TypeScript"
-                      />
-                      {errors.skills?.[index]?.skillName && (
-                        <p className="text-sm text-red-500">
-                          {errors.skills[index]?.skillName?.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>経験年数・詳細</Label>
-                    <Input
-                      {...register(`skills.${index}.experience` as const)}
-                      placeholder="例：3年、実務経験あり"
-                    />
-                  </div>
-                </div>
-              ))}
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  appendSkill({
-                    id: crypto.randomUUID(),
-                    skillName: "",
-                  })
-                }
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                スキルを追加
-              </Button>
+【ツール・その他】
+Git、Docker、AWS、Figma`}
+                rows={8}
+              />
             </CardContent>
           </Card>
 
