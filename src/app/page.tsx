@@ -110,19 +110,19 @@ export default function Home() {
           <QualificationsSection register={register} qualificationArray={qualificationArray} />
 
           <TextSection
-            title="自己PR（任意）"
-            description="あなたの強みや特技、これまでの経験をアピールしましょう。"
-            valueLength={selfPRLength}
-            textareaProps={register("selfPR")}
-            helper={<SelfPrHelper />}
-          />
-
-          <TextSection
             title="志望動機（任意）"
             description="なぜこの企業・職種を志望するのか、あなたの思いを伝えましょう。"
             valueLength={motivationLength}
             textareaProps={register("motivation")}
             helper={<MotivationHelper />}
+          />
+
+          <TextSection
+            title="自己PR（任意）"
+            description="あなたの強みや特技、これまでの経験をアピールしましょう。"
+            valueLength={selfPRLength}
+            textareaProps={register("selfPR")}
+            helper={<SelfPrHelper />}
           />
 
           <TextSection
