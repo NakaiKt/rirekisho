@@ -224,8 +224,6 @@ export const careerSchema = z.object({
         department: z.string().optional(),
         position: z.string().optional(),
         jobDescription: z.string().optional(),
-        achievements: z.string().optional(),
-        technologies: z.string().optional(),
       })
     )
     .superRefine((entries, ctx) => {
@@ -249,16 +247,7 @@ export const careerSchema = z.object({
     })
     .optional(),
 
-  skills: z
-    .array(
-      z.object({
-        id: z.string(),
-        category: z.string().optional(),
-        skillName: z.string().min(1, "スキル名を入力してください"),
-        experience: z.string().optional(),
-      })
-    )
-    .optional(),
+  skills: z.string().optional(),
 });
 
 export type CareerFormData = z.infer<typeof careerSchema>;
