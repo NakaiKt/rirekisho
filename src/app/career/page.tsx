@@ -36,7 +36,18 @@ export default function CareerPage() {
   } = useForm<CareerFormData>({
     resolver: zodResolver(careerSchema),
     defaultValues: {
+      name: "",
+      furigana: "",
       birthDate: "",
+      gender: undefined,
+      postalCode: "",
+      prefecture: "",
+      city: "",
+      address: "",
+      building: "",
+      email: "",
+      phone: "",
+      summary: "",
       careerHistory: [],
       skills: "",
     },
