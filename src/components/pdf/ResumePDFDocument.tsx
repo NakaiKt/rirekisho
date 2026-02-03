@@ -297,7 +297,7 @@ export const ResumePDFDocument: React.FC<ResumePDFDocumentProps> = ({ data }) =>
         {/* 基本情報テーブル */}
         <View style={styles.table} wrap={false}>
           {/* 上部：左側に基本情報、右側に写真 */}
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000000', borderBottomStyle: 'solid' }}>
             {/* 左側：ふりがな〜性別 */}
             <View style={{ flex: 1 }}>
               {/* ふりがな行 */}
