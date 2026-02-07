@@ -378,15 +378,14 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
 
         {/* 職務経歴 */}
         {data.careerHistory && data.careerHistory.length > 0 && (
-          <>
-            <View style={styles.sectionHeader} minPresenceAhead={100}>
+          <View wrap={false}>
+            <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>職務経歴</Text>
             </View>
             <View style={styles.sectionContent}>
               {data.careerHistory.map((career, index) => (
                 <View
                   key={career.id}
-                  wrap={false}
                   style={
                     index === data.careerHistory!.length - 1
                       ? styles.careerEntryLast
@@ -418,7 +417,7 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
                 </View>
               ))}
             </View>
-          </>
+          </View>
         )}
 
         {/* 保有スキル */}
