@@ -397,9 +397,9 @@ export const ResumePDFDocument: React.FC<ResumePDFDocumentProps> = ({ data }) =>
 
         {/* 学歴・職歴テーブル */}
         {(educationRows.length > 0 || workHistoryRows.length > 0) && (
-          <View style={styles.table} wrap={false}>
+          <View style={styles.table}>
             {/* ヘッダー */}
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} minPresenceAhead={50}>
               <View style={{ ...styles.tableHeader, width: 70 }}>
                 <Text style={{ textAlign: 'center' }}>年</Text>
               </View>
@@ -482,8 +482,8 @@ export const ResumePDFDocument: React.FC<ResumePDFDocumentProps> = ({ data }) =>
 
         {/* 資格・免許 */}
         {qualificationRows.length > 0 && (
-          <View style={styles.table} wrap={false}>
-            <View style={styles.tableRow}>
+          <View style={styles.table}>
+            <View style={styles.tableRow} minPresenceAhead={50}>
               <View style={{ ...styles.tableHeader, width: 70 }}>
                 <Text style={{ textAlign: 'center' }}>年</Text>
               </View>
@@ -515,7 +515,7 @@ export const ResumePDFDocument: React.FC<ResumePDFDocumentProps> = ({ data }) =>
 
         {/* 志望動機・自己PR */}
         {(data.motivation || data.selfPR) && (
-          <View style={styles.table} wrap={false}>
+          <View style={styles.table}>
             {data.motivation && (
               <View style={data.selfPR ? styles.tableRow : styles.tableRowLast}>
                 <View style={{ ...styles.labelCell, width: 80 }}>
@@ -541,7 +541,7 @@ export const ResumePDFDocument: React.FC<ResumePDFDocumentProps> = ({ data }) =>
 
         {/* 本人希望欄 */}
         {data.remarks && (
-          <View style={styles.table} wrap={false}>
+          <View style={styles.table}>
             <View style={styles.tableRowLast}>
               <View style={{ ...styles.labelCell, width: 80 }}>
                 <Text>本人希望欄</Text>

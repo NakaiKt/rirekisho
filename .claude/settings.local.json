@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:rirekisho-nakaikt.vercel.app)",
+      "WebFetch(domain:rirekisho-ewuj0zw56-nakaikts-projects.vercel.app)",
+      "mcp__claude_ai_Vercel__list_teams",
+      "mcp__claude_ai_Vercel__list_projects",
+      "mcp__claude_ai_Vercel__list_deployments",
+      "mcp__claude_ai_Vercel__web_fetch_vercel_url",
+      "mcp__claude_ai_Vercel__get_deployment_build_logs",
+      "Bash(npx next build:*)",
+      "Bash(pnpm install:*)",
+      "Bash(npm install:*)",
+      "Bash(./node_modules/.bin/next build:*)",
+      "Bash(node:*)"
+    ]
+  }
+}
