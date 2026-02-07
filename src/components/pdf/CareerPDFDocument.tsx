@@ -366,11 +366,11 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
 
         {/* 職務要約 */}
         {data.summary && (
-          <View style={{ borderWidth: 1.5, borderColor: '#000000', marginBottom: 15 }}>
-            <View style={{ backgroundColor: '#f3f4f6', padding: 8, borderBottomWidth: 1.5, borderBottomColor: '#000000' }} minPresenceAhead={50}>
+          <View wrap={false}>
+            <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>職務要約</Text>
             </View>
-            <View style={{ padding: 10 }}>
+            <View style={styles.sectionContent}>
               <Text style={{ lineHeight: 1.5 }}>{data.summary}</Text>
             </View>
           </View>
@@ -378,15 +378,14 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
 
         {/* 職務経歴 */}
         {data.careerHistory && data.careerHistory.length > 0 && (
-          <View style={{ borderWidth: 1.5, borderColor: '#000000', marginBottom: 15 }}>
-            <View style={{ backgroundColor: '#f3f4f6', padding: 8, borderBottomWidth: 1.5, borderBottomColor: '#000000' }} minPresenceAhead={150}>
+          <View wrap={false}>
+            <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>職務経歴</Text>
             </View>
-            <View style={{ padding: 10 }}>
+            <View style={styles.sectionContent}>
               {data.careerHistory.map((career, index) => (
                 <View
                   key={career.id}
-                  wrap={false}
                   style={
                     index === data.careerHistory!.length - 1
                       ? styles.careerEntryLast
@@ -423,11 +422,11 @@ export const CareerPDFDocument: React.FC<CareerPDFDocumentProps> = ({ data }) =>
 
         {/* 保有スキル */}
         {data.skills && (
-          <View style={{ borderWidth: 1.5, borderColor: '#000000', marginBottom: 15 }}>
-            <View style={{ backgroundColor: '#f3f4f6', padding: 8, borderBottomWidth: 1.5, borderBottomColor: '#000000' }} minPresenceAhead={50}>
+          <View wrap={false}>
+            <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>保有スキル</Text>
             </View>
-            <View style={{ padding: 10 }}>
+            <View style={styles.sectionContent}>
               <Text style={{ lineHeight: 1.5 }}>{data.skills}</Text>
             </View>
           </View>
